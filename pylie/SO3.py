@@ -4,8 +4,8 @@ from scipy.spatial.transform import Rotation
 import numpy as np
 
 class SO3(LieGroup.LieGroup):
-    def __init__(self, R = Rotation.identity()):
-        self._rot = R
+    def __init__(self, R = None):
+        self._rot = Rotation.identity()
     
     def R(self) -> np.ndarray:
         return self._rot.as_matrix()

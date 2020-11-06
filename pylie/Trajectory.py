@@ -72,6 +72,9 @@ class Trajectory:
     def get_elements(self):
         return self._elements
     
+    def get_times(self):
+        return self._times
+
     def group_type(self):
         if len(self._elements) > 0:
             return type(self._elements[0])

@@ -4,7 +4,7 @@ from R3 import R3 as R3
 import numpy as np
 
 class SE3(LieGroup.LieGroup):
-    def __init__(self, R = None, x = None):
+    def __init__(self, R = None : SO3, x = None : R3):
         if R is None:
             R = SO3()
         if x is None:
