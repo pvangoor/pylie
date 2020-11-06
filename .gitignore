@@ -1,0 +1,4 @@
+build/*
+dist/*
+pylie.egg-info/*
+pylie/__pycache__/*
