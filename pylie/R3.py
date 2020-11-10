@@ -1,7 +1,7 @@
-import LieGroup
+from .LieGroup import LieGroup
 import numpy as np
 
-class R3(LieGroup.LieGroup):
+class R3(LieGroup):
     # The Lie group of dim 3 translation.
     # [ I_3  x ]
     # [  0   1 ]

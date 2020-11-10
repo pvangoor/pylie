@@ -1,10 +1,10 @@
-import LieGroup
-from SO3 import SO3 as SO3
-from R3 import R3 as R3
+from .LieGroup import LieGroup
+from .SO3 import SO3 as SO3
+from .R3 import R3 as R3
 import numpy as np
 
-class SE3(LieGroup.LieGroup):
-    def __init__(self, R = None : SO3, x = None : R3):
+class SE3(LieGroup):
+    def __init__(self, R : SO3 = None, x : R3 = None):
         if R is None:
             R = SO3()
         if x is None:

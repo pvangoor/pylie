@@ -1,6 +1,6 @@
-from SIM3 import SIM3 as SIM3
+from .SIM3 import SIM3
 import numpy as np
-from Trajectory import Trajectory
+from .Trajectory import Trajectory
 
 def align_trajectory(trajectory0 : Trajectory, trajectory1 : Trajectory) -> Trajectory:
     # Align trajectory1 to trajectory0

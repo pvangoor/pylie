@@ -1,8 +1,8 @@
-import LieGroup
+from .LieGroup import LieGroup
 import numpy as np
-from R3 import R3 as R3
+from .R3 import R3 as R3
 
-class S1(LieGroup.LieGroup):
+class S1(LieGroup):
     # The Lie group of dim 1 scaling.
     # [ s ]
     def __init__(self, s = 1.0):

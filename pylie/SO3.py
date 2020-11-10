@@ -1,9 +1,9 @@
-import LieGroup
-from R3 import R3 as R3
+from .LieGroup import LieGroup
+from .R3 import R3 as R3
 from scipy.spatial.transform import Rotation
 import numpy as np
 
-class SO3(LieGroup.LieGroup):
+class SO3(LieGroup):
     def __init__(self, R = None):
         self._rot = Rotation.identity()
     

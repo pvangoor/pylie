@@ -1,12 +1,12 @@
-import LieGroup
-from SE3 import SE3 as SE3
-from SO3 import SO3 as SO3
-from R3 import R3 as R3
-from S1 import S1 as S1
+from .LieGroup import LieGroup
+from .SE3 import SE3 as SE3
+from .SO3 import SO3 as SO3
+from .R3 import R3 as R3
+from .S1 import S1 as S1
 import numpy as np
 
 
-class SIM3(LieGroup.LieGroup):
+class SIM3(LieGroup):
     # SIM(3) is defined with the matrix form
     # [ sR x ]
     # [ 0  1 ]

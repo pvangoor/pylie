@@ -1,9 +1,9 @@
-import LieGroup
-from SO3 import SO3 as SO3
-from S1 import S1 as S1
+from .LieGroup import LieGroup
+from .SO3 import SO3 as SO3
+from .S1 import S1 as S1
 import numpy as np
 
-class SOT3(LieGroup.LieGroup):
+class SOT3(LieGroup):
     def __init__(self, R = None, s = None):
         if R is None:
             R = SO3()
