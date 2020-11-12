@@ -3,7 +3,7 @@ from .SO3 import SO3
 from .SOT3 import SOT3
 from .SE3 import SE3
 from .SIM3 import SIM3
-from .S1 import S1
+from .S1 import MR1
 from .R3 import R3
 from .Trajectory import Trajectory
 from . import analysis

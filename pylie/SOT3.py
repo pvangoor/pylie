@@ -1,27 +1,24 @@
 from .LieGroup import LieGroup
 from .SO3 import SO3 as SO3
-from .S1 import S1 as S1
+from .S1 import MR1 as MR1
 import numpy as np
 
 class SOT3(LieGroup):
-    def __init__(self, R = None, s = None):
+    def __init__(self, R : SO3 = None, s : MR1 = None):
         if R is None:
             R = SO3()
         if s is None:
-            s = S1()
+            s = MR1()
         assert isinstance(R, SO3)
-        assert isinstance(s, S1)
+        assert isinstance(s, MR1)
         self._R = R
         self._s = s
     
     def R(self) -> np.ndarray:
-        return self._R.R()
-    
-    def q(self) -> np.ndarray:
-        return self._R.q()
+        return self._R
     
     def s(self) -> np.ndarray:
-        return self._s.s()
+        return self._s
 
     def __str__(self):
         return str(self.as_matrix())
@@ -47,13 +44,16 @@ class SOT3(LieGroup):
     def identity():
         result = SOT3()
         result._R = SO3.identity()
-        result._s = S1.identity()
+        result._s = MR1.identity()
         return result
     
     def as_matrix(self):
-        mat = np.eye(4)
+        mat = np.eye(3)
         mat[0:3,0:3] = self._s.s() * self._R.as_matrix()
         return mat
+    
+    def as_quaternion(self) -> np.ndarray:
+        return self.R().as_quaternion() * self._s
 
     @staticmethod
     def from_matrix(mat : np.ndarray) -> 'SOT3':
@@ -66,7 +66,7 @@ class SOT3(LieGroup):
         m = mat[0:3,0:3]
         Q = m.T @ m
         # Q is s^2 I_3.
-        result._s = S1(Q[0,0]**0.5)
+        result._s = MR1(Q[0,0]**0.5)
         result._R = SO3.from_matrix(m / result._s)
 
         return result
@@ -106,20 +106,20 @@ class SOT3(LieGroup):
         # Q : 9 entry matrix (row-by-row)
         result = {'Q':9}
         result.update(SO3.valid_list_formats())
-        result.update(S1.valid_list_formats())
+        result.update(MR1.valid_list_formats())
         return result
 
     @staticmethod
     def from_list(line, format_spec="qs") -> 'SOT3':
         result = SOT3()
         SO3_formats = SO3.valid_list_formats()
-        S1_formats = S1.valid_list_formats()
+        S1_formats = MR1.valid_list_formats()
         for fspec in format_spec:
             if fspec in SO3_formats:
                 result._R = SO3.from_list(line, fspec)
                 line = line[SO3_formats[fspec]:]
             elif fspec in S1_formats:
-                result._s = S1.from_list(line, fspec)
+                result._s = MR1.from_list(line, fspec)
                 line = line[S1_formats[fspec]:]
             elif fspec == "Q":
                 mat = np.reshape(np.array([float(line[i]) for i in range(9)]), (3,3))
@@ -132,7 +132,7 @@ class SOT3(LieGroup):
     def to_list(self, format_spec) -> list:
         result = []
         SO3_formats = SO3.valid_list_formats()
-        S1_formats = S1.valid_list_formats()
+        S1_formats = MR1.valid_list_formats()
         for fspec in format_spec:
             if fspec in SO3_formats:
                 result += self._R.to_list(fspec)
@@ -148,12 +148,12 @@ class SOT3(LieGroup):
     def list_header(format_spec) -> list:
         result = []
         SO3_formats = SO3.valid_list_formats()
-        S1_formats = S1.valid_list_formats()
+        S1_formats = MR1.valid_list_formats()
         for fspec in format_spec:
             if fspec == "Q":
                 result += "Q11,Q12,Q13,Q21,Q22,Q23,Q31,Q32,Q33".split()
             elif fspec in S1_formats:
-                result += S1.list_header(fspec)
+                result += MR1.list_header(fspec)
             elif fspec in SO3_formats:
                 result += SO3.list_header(fspec)
             else:

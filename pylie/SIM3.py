@@ -2,7 +2,7 @@ from .LieGroup import LieGroup
 from .SE3 import SE3 as SE3
 from .SO3 import SO3 as SO3
 from .R3 import R3 as R3
-from .S1 import S1 as S1
+from .S1 import MR1 as MR1
 import numpy as np
 
 
@@ -10,22 +10,19 @@ class SIM3(LieGroup):
     # SIM(3) is defined with the matrix form
     # [ sR x ]
     # [ 0  1 ]
-    def __init__(self, R=SO3(), x=R3(), s=S1()):
+    def __init__(self, R=SO3(), x=R3(), s=MR1()):
         self._R = R
         self._x = x
         self._s = s
 
     def R(self):
-        return self._R.R()
-    
-    def q(self):
-        return self._R.q()
+        return self._R
 
     def x(self):
-        return self._x.x()
+        return self._x
 
     def s(self):
-        return self._s.s()
+        return self._s
 
     def __str__(self):
         return str(self.as_matrix())
@@ -95,7 +92,7 @@ class SIM3(LieGroup):
         result = dict()
         result.update(SO3.valid_list_formats())
         result.update(R3.valid_list_formats())
-        result.update(S1.valid_list_formats())
+        result.update(MR1.valid_list_formats())
         return result
 
     @staticmethod
@@ -103,14 +100,14 @@ class SIM3(LieGroup):
         result = SE3()
         SO3_formats = SO3.valid_list_formats()
         R3_formats = R3.valid_list_formats()
-        S1_formats = S1.valid_list_formats()
+        S1_formats = MR1.valid_list_formats()
         for fspec in format_spec:
             if fspec in SO3_formats:
                 result._R = SO3.from_list(line, fspec)
             elif fspec in R3_formats:
                 result._x = R3.from_list(line, fspec)
             elif fspec in S1_formats:
-                result._s = S1.from_list(line, fspec)
+                result._s = MR1.from_list(line, fspec)
             else:
                 return NotImplemented
         return result
@@ -119,7 +116,7 @@ class SIM3(LieGroup):
         result = []
         SO3_formats = SO3.valid_list_formats()
         R3_formats = R3.valid_list_formats()
-        S1_formats = S1.valid_list_formats()
+        S1_formats = MR1.valid_list_formats()
         for fspec in format_spec:
             if fspec in SO3_formats:
                 result += self._R.to_list(fspec)
@@ -136,14 +133,14 @@ class SIM3(LieGroup):
         result = []
         SO3_formats = SO3.valid_list_formats()
         R3_formats = R3.valid_list_formats()
-        S1_formats = S1.valid_list_formats()
+        S1_formats = MR1.valid_list_formats()
         for fspec in format_spec:
             if fspec in R3_formats:
                 result += R3.list_header(fspec)
             elif fspec in SO3_formats:
                 result += SO3.list_header(fspec)
             elif fspec in S1_formats:
-                result += S1.list_header(fspec)
+                result += MR1.list_header(fspec)
             else:
                 return NotImplemented
         return result

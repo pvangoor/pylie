@@ -2,6 +2,12 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 class LieGroup(ABC):
+    def __str__(self):
+        pass
+
+    def __repr__(self):
+        return str(self.as_matrix())
+
     @abstractmethod
     def __mul__(self, other):
         pass

@@ -10,7 +10,7 @@ class SO3(LieGroup):
     def R(self) -> np.ndarray:
         return self._rot.as_matrix()
 
-    def q(self) -> np.ndarray:
+    def as_quaternion(self) -> np.ndarray:
         return self._rot.as_quat()
 
     def __str__(self):

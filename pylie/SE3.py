@@ -13,13 +13,10 @@ class SE3(LieGroup):
         self._x = x
     
     def R(self) -> np.ndarray:
-        return self._R.R()
-    
-    def q(self) -> np.ndarray:
-        return self._R.q()
+        return self._R
     
     def x(self) -> np.ndarray:
-        return self._x.x()
+        return self._x
 
     def __str__(self):
         return str(self.as_matrix())
