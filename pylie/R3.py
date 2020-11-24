@@ -58,6 +58,9 @@ class R3(LieGroup):
         result[0:3,3:4] = self._trans
         return result
     
+    def as_vector(self):
+        return self._trans.copy()
+    
     @staticmethod
     def identity():
         result = R3()
