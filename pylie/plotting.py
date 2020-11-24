@@ -99,8 +99,8 @@ class ArtificialHorizonArtist(Artist):
         true_horizon = self._compute_horizon(attitude)
         self._horizon_line.set_data(true_horizon[0,:], true_horizon[1,:])
 
-        height = self._compute_horizon_height(attitude_data)
-        slope = self._compute_horizon_slope(attitude_data) * 180.0 / np.pi
+        height = self._compute_horizon_height(attitude)
+        slope = self._compute_horizon_slope(attitude) * 180.0 / np.pi
         self._shade.set_center((0,height))
         self._shade.set_theta1(-180 + slope)
         self._shade.set_theta2(slope)
