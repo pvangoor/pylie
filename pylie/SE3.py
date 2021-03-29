@@ -23,9 +23,9 @@ class SE3(LieGroup):
     
     def Adjoint(self) -> np.ndarray:
         Ad = np.zeros((6,6))
-        R = self.R()
+        R = self.R().as_matrix()
         Ad[0:3,0:3] = R
-        Ad[3:6,0:3] = SO3.skew(self.x()) @ R
+        Ad[3:6,0:3] = SO3.skew(self.x().as_vector()) @ R
         Ad[3:6,3:6] = R
         return Ad
     
@@ -176,7 +176,7 @@ class SE3(LieGroup):
             elif fspec in R3_formats:
                 result += self._x.to_list(fspec)
             elif fspec == "P":
-                posemat = np.hstack((self.R(), self.x()))
+                posemat = np.hstack((self.R().as_matrix(), self.x().as_vector()))
                 result += posemat.ravel().tolist()
             else:
                 return NotImplemented
