@@ -9,8 +9,8 @@ class SE3(LieGroup):
             R = SO3()
         if x is None:
             x = R3()
-        self._R = R
-        self._x = x
+        self._R = SO3(R)
+        self._x = R3(x)
     
     def R(self) -> np.ndarray:
         return self._R

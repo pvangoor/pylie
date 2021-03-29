@@ -1,3 +1,4 @@
+from numpy.lib.arraysetops import isin
 from .LieGroup import LieGroup
 from .R3 import R3 as R3
 from scipy.spatial.transform import Rotation
@@ -5,7 +6,12 @@ import numpy as np
 
 class SO3(LieGroup):
     def __init__(self, R = None):
-        self._rot = Rotation.identity()
+        if R is None:
+            self._rot = Rotation.identity()
+        if isinstance(R, np.ndarray):
+            self._rot = Rotation.from_matrix(R)
+        elif isinstance(R, SO3):
+            self._rot = R._rot
     
     def R(self) -> np.ndarray:
         return self._rot.as_matrix()
