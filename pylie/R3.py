@@ -1,3 +1,4 @@
+from numpy.lib.arraysetops import isin
 from .LieGroup import LieGroup
 import numpy as np
 
@@ -5,8 +6,12 @@ class R3(LieGroup):
     # The Lie group of dim 3 translation.
     # [ I_3  x ]
     # [  0   1 ]
-    def __init__(self, x = np.zeros((3,1))):
-        self._trans = x
+    def __init__(self, x = None):
+        if x is None:
+            self._trans = np.zeros((3,1))
+        else:
+            if isinstance(x, np.ndarray) or isinstance(x ,list):
+                self._trans = np.reshape(x, (3,1))
     
     def x(self) -> np.ndarray:
         return self._trans

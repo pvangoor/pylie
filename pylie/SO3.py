@@ -6,12 +6,15 @@ import numpy as np
 
 class SO3(LieGroup):
     def __init__(self, R = None):
-        if R is None:
-            self._rot = Rotation.identity()
+        self._rot = Rotation.identity()
         if isinstance(R, np.ndarray):
             self._rot = Rotation.from_matrix(R)
         elif isinstance(R, SO3):
             self._rot = R._rot
+        elif isinstance(R, Rotation):
+            self._rot = R
+            
+        
     
     def R(self) -> np.ndarray:
         return self._rot.as_matrix()
