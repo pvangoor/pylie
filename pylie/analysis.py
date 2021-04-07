@@ -3,7 +3,7 @@ import numpy as np
 from .Trajectory import Trajectory
 
 def align_trajectory(trajectory0 : Trajectory, trajectory1 : Trajectory) -> Trajectory:
-    # Align trajectory1 to trajectory0
+    # Align trajectory0 to trajectory1
     assert isinstance(trajectory0, Trajectory)
     assert isinstance(trajectory1, Trajectory)
     
@@ -14,8 +14,8 @@ def align_trajectory(trajectory0 : Trajectory, trajectory1 : Trajectory) -> Traj
     
     num_points = 100
     times = np.linspace(t0, t1, num_points).tolist()
-    points0 = [trajectory0[t].x() for t in times]
-    points1 = [trajectory1[t].x() for t in times]
+    points0 = [trajectory0[t].x().as_vector() for t in times]
+    points1 = [trajectory1[t].x().as_vector() for t in times]
 
     S = umeyama(points0, points1).to_SE3()
 

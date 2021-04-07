@@ -39,6 +39,10 @@ class Trajectory:
             ndt = t - self._times[next_idx-1]
             elem = base_element * base_element.exp(ndt * motion)
             return elem
+        
+        elif isinstance(t, list):
+            # t is a list of numbers -> return the corresponding trajectory
+            return Trajectory([self[tau] for tau in t], t)
 
         raise NotImplementedError
 
