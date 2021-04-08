@@ -27,6 +27,11 @@ class frameArtist(Artist):
             temp, = ax.plot([t[0,0], t[0,0]+Q[0,a]], [t[1,0], t[1,0]+Q[1,a]], [t[2,0], t[2,0]+Q[2,a]], colors[a])
             self._frame_lines.append(temp)
         self._frame_center, = ax.plot(t[0,0], t[1,0], t[2,0], 'ko')
+
+        if isinstance(pose_data, SO3):
+            ax.set_xlim(-1, 1)
+            ax.set_ylim(-1, 1)
+            ax.set_zlim(-1, 1)
     
     def set_pose_data(self, pose : SE3):
         if not isinstance(pose, (SIM3, SE3, SO3)):
@@ -142,7 +147,8 @@ class ArtificialHorizonArtist(Artist):
 
 def plotFrame(frame : LieGroup, style='-', ax : Axes3D = None):
     if ax is None:
-        ax = plt.gca()
+        fig = plt.gcf()
+        ax = fig.add_subplot(111, projection='3d')
     
     frame_artist = frameArtist(ax, frame, style)
 
