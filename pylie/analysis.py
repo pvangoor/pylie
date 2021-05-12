@@ -2,7 +2,7 @@ from .SIM3 import SIM3
 import numpy as np
 from .Trajectory import Trajectory
 
-def align_trajectory(trajectory0 : Trajectory, trajectory1 : Trajectory) -> Trajectory:
+def align_trajectory(trajectory0 : Trajectory, trajectory1 : Trajectory, ret_params=False) -> Trajectory:
     # Align trajectory0 to trajectory1
     assert isinstance(trajectory0, Trajectory)
     assert isinstance(trajectory1, Trajectory)
@@ -17,10 +17,13 @@ def align_trajectory(trajectory0 : Trajectory, trajectory1 : Trajectory) -> Traj
     points0 = [trajectory0[t].x().as_vector() for t in times]
     points1 = [trajectory1[t].x().as_vector() for t in times]
 
-    S = umeyama(points0, points1).to_SE3()
+    S = umeyama(points0, points1)
 
-    trajectoryA = S * trajectory0
-    return trajectoryA
+    trajectoryA = S.to_SE3() * trajectory0
+    if ret_params:
+        return trajectoryA, S
+    else:
+        return trajectoryA
 
 
 

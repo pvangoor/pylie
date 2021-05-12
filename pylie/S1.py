@@ -45,6 +45,9 @@ class MR1(LieGroup):
     def as_matrix(self):
         return np.array(self._scale)
     
+    def as_float(self):
+        return float(self._scale)
+    
     @staticmethod
     def identity():
         result = MR1()
