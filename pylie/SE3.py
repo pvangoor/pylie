@@ -12,13 +12,13 @@ class SE3(LieGroup):
         self._R = SO3(R)
         self._x = R3(x)
     
-    def R(self) -> np.ndarray:
+    def R(self) -> SO3:
         return self._R
     
-    def x(self) -> np.ndarray:
+    def x(self) -> R3:
         return self._x
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.as_matrix())
     
     def Adjoint(self) -> np.ndarray:
@@ -41,7 +41,7 @@ class SE3(LieGroup):
         ad[3:6,3:6] = OmegaCross
         return ad
     
-    def __mul__(self, other):
+    def __mul__(self, other) -> 'SE3':
         if isinstance(other, SE3):
             result = SE3()
             result._R = self._R * other._R
@@ -56,13 +56,13 @@ class SE3(LieGroup):
         return NotImplemented
     
     @staticmethod
-    def identity():
+    def identity() -> 'SE3':
         result = SE3()
         result._R = SO3.identity()
         result._x = R3.identity()
         return result
     
-    def as_matrix(self):
+    def as_matrix(self) -> np.ndarray:
         mat = np.eye(4)
         mat[0:3,0:3] = self._R.as_matrix()
         mat[0:3,3:4] = self._x._trans
@@ -80,19 +80,19 @@ class SE3(LieGroup):
         result._x._trans = mat[0:3,3:4]
         return result
     
-    def __truediv__(self, other):
+    def __truediv__(self, other) -> 'SE3':
         if isinstance(other, SE3):
             return self * other.inv()
         return NotImplemented
     
-    def inv(self):
+    def inv(self) -> 'SE3':
         result = SE3()
         result._R = self._R.inv()
         result._x = - (self._R.inv() * self._x)
         return result
     
     @staticmethod
-    def exp(se3arr):
+    def exp(se3arr) -> 'SE3':
         if not isinstance(se3arr, np.ndarray):
             raise TypeError
         if se3arr.shape == (4,4):

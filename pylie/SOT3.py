@@ -48,8 +48,7 @@ class SOT3(LieGroup):
         return result
     
     def as_matrix(self):
-        mat = np.eye(3)
-        mat[0:3,0:3] = self._s.s() * self._R.as_matrix()
+        mat = self._s.as_float() * self._R.as_matrix()
         return mat
     
     def as_quaternion(self) -> np.ndarray:
