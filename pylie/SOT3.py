@@ -9,10 +9,8 @@ class SOT3(LieGroup):
             R = SO3()
         if s is None:
             s = MR1()
-        assert isinstance(R, SO3)
-        assert isinstance(s, MR1)
-        self._R = R
-        self._s = s
+        self._R = SO3(R)
+        self._s = MR1(s)
     
     def R(self) -> np.ndarray:
         return self._R
@@ -86,11 +84,13 @@ class SOT3(LieGroup):
         if not isinstance(sot3arr, np.ndarray):
             raise TypeError
         if sot3arr.shape == (4,4):
-            sot3arr = SE3.vee(sot3arr)
+            sot3arr = SOT3.vee(sot3arr)
         elif not sot3arr.shape == (4,1):
             raise ValueError
 
-        return NotImplemented
+        result = SOT3(SO3.exp(sot3arr[0:3,0:1]), np.exp(sot3arr[3,0]))
+
+        return result
     
     def log(self) -> np.ndarray:
         w = self._R.log()
