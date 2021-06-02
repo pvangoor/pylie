@@ -190,7 +190,8 @@ class SO3(LieGroup):
         #     raise ValueError("The vectors cannot be exactly opposing.")
 
         # return SO3.from_matrix(mat)
-        result = SO3(Rotation.align_vectors(dest.T, origin.T))
+        rot, _ = Rotation.align_vectors(dest.T, origin.T)
+        result = SO3(rot)
         return result
 
 if __name__ == "__main__":
