@@ -1,107 +1,124 @@
 from .LieGroup import LieGroup
 from .SO3 import SO3 as SO3
+from .SE3 import SE3 as SE3
 from .R3 import R3 as R3
 import numpy as np
 
-class SE3(LieGroup):
-    def __init__(self, R : SO3 = None, x : R3 = None):
+class SE23(LieGroup):
+    def __init__(self, R : SO3 = None, x : R3 = None, w : R3 = None):
         if R is None:
             R = SO3()
         if x is None:
             x = R3()
+        if w is None:
+            w = R3()
         self._R = SO3(R)
         self._x = R3(x)
+        self._w = R3(w)
     
     def R(self) -> SO3:
         return self._R
     
     def x(self) -> R3:
         return self._x
+    
+    def P(self) -> SE3:
+        return SE3(self._R, self._x)
+
+    def w(self) -> R3:
+        return self._w
 
     def __str__(self) -> str:
         return str(self.as_matrix())
     
     def Adjoint(self) -> np.ndarray:
-        Ad = np.zeros((6,6))
+        Ad = np.zeros((9,9))
         R = self.R().as_matrix()
         Ad[0:3,0:3] = R
         Ad[3:6,0:3] = SO3.skew(self.x().as_vector()) @ R
         Ad[3:6,3:6] = R
+        Ad[6:9,3:6] = SO3.skew(self.w().as_vector()) @ R
+        Ad[6:9,6:9] = R
         return Ad
     
     @staticmethod
-    def adjoint(se3vec : np.ndarray) -> np.ndarray:
-        assert isinstance(se3vec, np.ndarray)
-        assert se3vec.shape == (6,1)
-        ad = np.zeros((6,6))
-        OmegaCross = SO3.skew(se3vec[0:3,:])
-        VCross = SO3.skew(se3vec[3:6,:])
+    def adjoint(se23vec : np.ndarray) -> np.ndarray:
+        assert isinstance(se23vec, np.ndarray)
+        assert se23vec.shape == (9,1)
+        ad = np.zeros((9,9))
+        OmegaCross = SO3.skew(se23vec[0:3,:])
+        VCross = SO3.skew(se23vec[3:6,:])
+        ACross = SO3.skew(se23vec[6:9,:])
         ad[0:3,0:3] = OmegaCross
         ad[3:6,0:3] = VCross
         ad[3:6,3:6] = OmegaCross
+        ad[6:9,3:6] = ACross
+        ad[6:9,6:9] = OmegaCross
         return ad
     
-    def __mul__(self, other) -> 'SE3':
-        if isinstance(other, SE3):
-            result = SE3()
+    def __mul__(self, other) -> 'SE23':
+        if isinstance(other, SE23):
+            result = SE23()
             result._R = self._R * other._R
             result._x = self._x + (self._R * other._x)
+            result._w = self._w + (self._R * other._w)
             return result
         if isinstance(other, np.ndarray):
-            if other.shape[0] == 3:
-                return self._x + (self._R * other)
-            elif other.shape[0] == 4:
+            if other.shape[0] == 5:
                 return self.as_matrix() @ other
         
         return NotImplemented
     
     @staticmethod
-    def identity() -> 'SE3':
-        result = SE3()
+    def identity() -> 'SE23':
+        result = SE23()
         result._R = SO3.identity()
         result._x = R3.identity()
+        result._w = R3.identity()
         return result
     
     def as_matrix(self) -> np.ndarray:
-        mat = np.eye(4)
+        mat = np.eye(5)
         mat[0:3,0:3] = self._R.as_matrix()
         mat[0:3,3:4] = self._x.as_vector()
+        mat[0:3,4:5] = self._x.as_vector()
         return mat
 
     @staticmethod
-    def from_matrix(mat : np.ndarray) -> 'SE3':
+    def from_matrix(mat : np.ndarray) -> 'SE23':
         if not isinstance(mat, np.ndarray):
             raise TypeError
-        if not mat.shape == (4,4):
+        if not mat.shape == (5,5):
             raise ValueError
         
-        result = SE3()
+        result = SE23()
         result._R = SO3.from_matrix(mat[0:3,0:3])
-        result._x._trans = mat[0:3,3:4]
+        result._x = R3(mat[0:3,3:4])
+        result._w = R3(mat[0:3,4:5])
         return result
     
-    def __truediv__(self, other) -> 'SE3':
-        if isinstance(other, SE3):
+    def __truediv__(self, other) -> 'SE23':
+        if isinstance(other, SE23):
             return self * other.inv()
         return NotImplemented
     
-    def inv(self) -> 'SE3':
-        result = SE3()
+    def inv(self) -> 'SE23':
+        result = SE23()
         result._R = self._R.inv()
         result._x = - (self._R.inv() * self._x)
+        result._w = - (self._R.inv() * self._w)
         return result
     
     @staticmethod
-    def exp(se3arr) -> 'SE3':
+    def exp(se3arr) -> 'SE23':
         if not isinstance(se3arr, np.ndarray):
             raise TypeError
-        if se3arr.shape == (4,4):
-            se3arr = SE3.vee(se3arr)
-        elif not se3arr.shape == (6,1):
+        if se3arr.shape == (5,5):
+            se3arr = SE23.vee(se3arr)
+        elif not se3arr.shape == (9,1):
             raise ValueError
 
         w = se3arr[0:3,0:1]
-        u = se3arr[3:6,0:1]
         theta = np.linalg.norm(w)
 
         if theta > 1e-6:
@@ -118,8 +135,9 @@ class SE3(LieGroup):
         R = np.eye(3) + A * wx + B * wx2
         V = np.eye(3) + B * wx + C * wx2
 
-        mat = np.block([[R, V@u],[np.zeros((1,4))]])
-        result = SE3.from_matrix(mat)
+        u1 = se3arr[3:6,0:1]
+        u2 = se3arr[6:9,0:1]
+        result = SE23(R, V@u1, V@u2)
 
         return result
     
@@ -131,16 +149,18 @@ class SE3(LieGroup):
             Vinv = np.eye(3) - 0.5 * wx + theta**(-2.0) * (1.0 - (theta*np.sin(theta))/(2*(1-np.cos(theta)))) * wx @ wx
         else:
             Vinv = np.eye(3) - 0.5*wx
-        u = Vinv @ self._x._trans
-        return np.vstack((w,u))
+        u1 = Vinv @ self._x.as_vector()
+        u2 = Vinv @ self._w.as_vector()
+        return np.vstack((w,u1,u2))
 
     @staticmethod
     def valid_list_formats() -> dict:
         # Possible formats are
         # q/w/R/r : SO(3) format specs
         # x : 3 entry translation
+        # v : 3 entry velocity
         # P : 12 entry homogeneous matrix (row-by-row)
-        result = {'P':12}
+        result = {'P':12, 'v':3}
         result.update(SO3.valid_list_formats())
         result.update(R3.valid_list_formats())
         return result
@@ -162,6 +182,9 @@ class SE3(LieGroup):
                 result._R._rot = result._R._rot.from_matrix(mat[0:3,0:3])
                 result._x._trans = mat[0:3,3:4]
                 line = line[12:]
+            elif fspec == "v":
+                result._w = R3.from_list(line, 'x')
+                line = line[R3_formats['x']:]
             else:
                 return NotImplemented
         return result
@@ -178,6 +201,8 @@ class SE3(LieGroup):
             elif fspec == "P":
                 posemat = np.hstack((self.R().as_matrix(), self.x().as_vector()))
                 result += posemat.ravel().tolist()
+            elif fspec == "v":
+                result += self._w.to_list('x')
             else:
                 return NotImplemented
         return result
@@ -194,6 +219,8 @@ class SE3(LieGroup):
                 result += R3.list_header(fspec)
             elif fspec in SO3_formats:
                 result += SO3.list_header(fspec)
+            elif fspec == 'v':
+                result += "v1,v2,v3".split()
             else:
                 return NotImplemented
         return result
@@ -202,23 +229,25 @@ class SE3(LieGroup):
     def vee(mat : np.ndarray) -> np.ndarray:
         if not isinstance(mat, np.ndarray):
             raise TypeError
-        if not mat.shape == (4,4):
+        if not mat.shape == (5,5):
             raise ValueError
         vecOmega = SO3.vex(mat[0:3,0:3])
         vecV = mat[0:3,3:4]
-        vec = np.vstack((vecOmega, vecV))
+        vecA = mat[0:3,4:5]
+        vec = np.vstack((vecOmega, vecV, vecA))
         return vec
 
     @staticmethod
     def wedge(vec : np.ndarray) -> np.ndarray:
         if not isinstance(vec, np.ndarray):
             raise TypeError
-        if not vec.shape == (6,1):
+        if not vec.shape == (9,1):
             raise ValueError
-        mat = np.zeros((4,4))
+        mat = np.zeros((5,5))
         mat[0:3,0:3] = SO3.skew(vec[0:3,0:1])
         mat[0:3,3:4] = vec[3:6, 0:1]
+        mat[0:3,4:5] = vec[6:9, 0:1]
         return mat
 
 if __name__ == "__main__":
-    P = SE3()
+    P = SE23()
