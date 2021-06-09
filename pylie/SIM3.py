@@ -2,7 +2,7 @@ from .LieGroup import LieGroup
 from .SE3 import SE3 as SE3
 from .SO3 import SO3 as SO3
 from .R3 import R3 as R3
-from .S1 import MR1 as MR1
+from .MR1 import MR1 as MR1
 import numpy as np
 
 
@@ -100,13 +100,13 @@ class SIM3(LieGroup):
         result = SE3()
         SO3_formats = SO3.valid_list_formats()
         R3_formats = R3.valid_list_formats()
-        S1_formats = MR1.valid_list_formats()
+        MR1_formats = MR1.valid_list_formats()
         for fspec in format_spec:
             if fspec in SO3_formats:
                 result._R = SO3.from_list(line, fspec)
             elif fspec in R3_formats:
                 result._x = R3.from_list(line, fspec)
-            elif fspec in S1_formats:
+            elif fspec in MR1_formats:
                 result._s = MR1.from_list(line, fspec)
             else:
                 return NotImplemented
@@ -116,13 +116,13 @@ class SIM3(LieGroup):
         result = []
         SO3_formats = SO3.valid_list_formats()
         R3_formats = R3.valid_list_formats()
-        S1_formats = MR1.valid_list_formats()
+        MR1_formats = MR1.valid_list_formats()
         for fspec in format_spec:
             if fspec in SO3_formats:
                 result += self._R.to_list(fspec)
             elif fspec in R3_formats:
                 result += self._x.to_list(fspec)
-            elif fspec in S1_formats:
+            elif fspec in MR1_formats:
                 result += self._s.to_list(fspec)
             else:
                 return NotImplemented
@@ -133,13 +133,13 @@ class SIM3(LieGroup):
         result = []
         SO3_formats = SO3.valid_list_formats()
         R3_formats = R3.valid_list_formats()
-        S1_formats = MR1.valid_list_formats()
+        MR1_formats = MR1.valid_list_formats()
         for fspec in format_spec:
             if fspec in R3_formats:
                 result += R3.list_header(fspec)
             elif fspec in SO3_formats:
                 result += SO3.list_header(fspec)
-            elif fspec in S1_formats:
+            elif fspec in MR1_formats:
                 result += MR1.list_header(fspec)
             else:
                 return NotImplemented

@@ -94,7 +94,7 @@ class MR1(LieGroup):
         return {'s':1}
 
     @staticmethod
-    def from_list(line, format_spec="s") -> 'S1':
+    def from_list(line, format_spec="s") -> 'MR1':
         result = MR1()
         if format_spec == "s":
             result._scale = float(line[0])
