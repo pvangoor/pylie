@@ -1,3 +1,4 @@
+from numpy.lib.arraysetops import isin
 from .LieGroup import LieGroup
 import numpy as np
 from .R3 import R3 as R3
@@ -6,7 +7,7 @@ class MR1(LieGroup):
     # The Lie group of dim 1 scaling.
     # [ s ]
     def __init__(self, s = 1.0):
-        self._scale = 1.0
+        self._scale = s
     
     def scale(self):
         return self._scale
@@ -21,16 +22,36 @@ class MR1(LieGroup):
             return result
         elif isinstance(other, np.ndarray):
             return float(self._scale) * other
+        elif isinstance(other, float):
+            return float(self._scale) * other
         elif isinstance(other, R3):
             result = R3()
             result._trans = self._scale * other._trans
             return result
         return NotImplemented
     
+    def __rmul__(self, other):
+        return self.__mul__(other)
+    
     def __truediv__(self, other):
         if isinstance(other, MR1):
             result = MR1()
             result._scale = self._scale / other._scale
+            return result
+        elif isinstance(other, float):
+            result = self / MR1(other)
+            return result
+        return NotImplemented
+
+    def __rtruediv__(self, other):
+        if isinstance(other, MR1):
+            result = MR1()
+            result._scale = other._scale / self._scale
+            return result
+        elif isinstance(other, np.ndarray):
+            return other / self.as_float()
+        elif isinstance(other, float):
+            result = MR1(other) / self
             return result
         return NotImplemented
     
@@ -46,6 +67,9 @@ class MR1(LieGroup):
         return np.array(self._scale)
     
     def as_float(self):
+        return float(self._scale)
+    
+    def __float__(self):
         return float(self._scale)
     
     @staticmethod

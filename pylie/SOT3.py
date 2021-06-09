@@ -56,7 +56,7 @@ class SOT3(LieGroup):
     def from_matrix(mat : np.ndarray) -> 'SOT3':
         if not isinstance(mat, np.ndarray):
             raise TypeError
-        if not mat.shape == (4,4) or mat.shape == (3,3):
+        if not (mat.shape == (4,4) or mat.shape == (3,3)):
             raise ValueError
         
         result = SOT3()
