@@ -12,6 +12,8 @@ class R3(LieGroup):
         else:
             if isinstance(x, np.ndarray) or isinstance(x ,list):
                 self._trans = np.reshape(x, (3,1))
+            if isinstance(x, R3):
+                self._trans = x._trans
             else:
                 self._trans = np.zeros((3,1))
     
