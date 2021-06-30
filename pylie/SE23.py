@@ -81,7 +81,7 @@ class SE23(LieGroup):
         mat = np.eye(5)
         mat[0:3,0:3] = self._R.as_matrix()
         mat[0:3,3:4] = self._x.as_vector()
-        mat[0:3,4:5] = self._x.as_vector()
+        mat[0:3,4:5] = self._w.as_vector()
         return mat
 
     @staticmethod
