@@ -179,20 +179,18 @@ class SO3(LieGroup):
     
     @staticmethod
     def from_vectors(origin : np.ndarray, dest : np.ndarray) -> 'SO3':
-        # origin = origin / np.linalg.norm(origin)
-        # dest = dest / np.linalg.norm(dest)
-        # v = np.cross(origin, dest, axis=0);
-        # c = origin.T @ dest
+        origin = origin / np.linalg.norm(origin)
+        dest = dest / np.linalg.norm(dest)
+        v = np.cross(origin, dest, axis=0);
+        c = origin.T @ dest
+        s = np.linalg.norm(v)
 
-        # vx = SO3.skew(v)
-        # mat = np.eye(3) + (vx + 1 / (1 + c) * vx @ vx);
-        # if (abs(1 + c) <= 1e-8):
-        #     raise ValueError("The vectors cannot be exactly opposing.")
+        vx = SO3.skew(v)
+        mat = np.eye(3) + vx + (1 - c) / (s**2) * vx @ vx;
+        if (abs(1 + c) <= 1e-8):
+            raise ValueError("The vectors cannot be exactly opposing.")
 
-        # return SO3.from_matrix(mat)
-        rot, _ = Rotation.align_vectors(dest.T, origin.T)
-        result = SO3(rot)
-        return result
+        return SO3.from_matrix(mat)
 
 if __name__ == "__main__":
     R = SO3()
