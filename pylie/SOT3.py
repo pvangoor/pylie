@@ -1,6 +1,6 @@
 from .LieGroup import LieGroup
 from .SO3 import SO3 as SO3
-from .S1 import MR1 as MR1
+from .MR1 import MR1 as MR1
 import numpy as np
 
 class SOT3(LieGroup):
@@ -112,14 +112,14 @@ class SOT3(LieGroup):
     def from_list(line, format_spec="qs") -> 'SOT3':
         result = SOT3()
         SO3_formats = SO3.valid_list_formats()
-        S1_formats = MR1.valid_list_formats()
+        MR1_formats = MR1.valid_list_formats()
         for fspec in format_spec:
             if fspec in SO3_formats:
                 result._R = SO3.from_list(line, fspec)
                 line = line[SO3_formats[fspec]:]
-            elif fspec in S1_formats:
+            elif fspec in MR1_formats:
                 result._s = MR1.from_list(line, fspec)
-                line = line[S1_formats[fspec]:]
+                line = line[MR1_formats[fspec]:]
             elif fspec == "Q":
                 mat = np.reshape(np.array([float(line[i]) for i in range(9)]), (3,3))
                 result = SOT3.from_matrix(mat)
@@ -131,11 +131,11 @@ class SOT3(LieGroup):
     def to_list(self, format_spec) -> list:
         result = []
         SO3_formats = SO3.valid_list_formats()
-        S1_formats = MR1.valid_list_formats()
+        MR1_formats = MR1.valid_list_formats()
         for fspec in format_spec:
             if fspec in SO3_formats:
                 result += self._R.to_list(fspec)
-            elif fspec in S1_formats:
+            elif fspec in MR1_formats:
                 result += self._s.to_list(fspec)
             elif fspec == "Q":
                 result += self.as_matrix().ravel().tolist()
@@ -147,11 +147,11 @@ class SOT3(LieGroup):
     def list_header(format_spec) -> list:
         result = []
         SO3_formats = SO3.valid_list_formats()
-        S1_formats = MR1.valid_list_formats()
+        MR1_formats = MR1.valid_list_formats()
         for fspec in format_spec:
             if fspec == "Q":
                 result += "Q11,Q12,Q13,Q21,Q22,Q23,Q31,Q32,Q33".split()
-            elif fspec in S1_formats:
+            elif fspec in MR1_formats:
                 result += MR1.list_header(fspec)
             elif fspec in SO3_formats:
                 result += SO3.list_header(fspec)
