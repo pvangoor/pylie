@@ -23,21 +23,18 @@ class LieGroup(ABC):
     def inv(self):
         pass
     
-    @abstractmethod
-    def __truediv__(self):
-        pass
+    def __truediv__(self, other):
+        return self * other.inv()
     
     @abstractmethod
     def log(self):
         pass
     
-    @abstractmethod
     def Adjoint(self):
-        pass
+        raise NotImplementedError()
 
-    @abstractmethod
     def as_matrix(self):
-        pass
+        raise NotImplementedError()
     
     @staticmethod
     def identity():
@@ -55,9 +52,8 @@ class LieGroup(ABC):
     def from_list(line, format_spec):
         pass
     
-    @abstractmethod
     def to_list(self, format_spec):
-        pass
+        raise NotImplementedError()
 
     @staticmethod
     def list_header(format_spec):
