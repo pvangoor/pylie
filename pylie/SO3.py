@@ -185,12 +185,24 @@ class SO3(LieGroup):
         c = origin.T @ dest
         s = np.linalg.norm(v)
 
-        vx = SO3.skew(v)
-        mat = np.eye(3) + vx + (1 - c) / (s**2) * vx @ vx;
         if (abs(1 + c) <= 1e-8):
-            raise ValueError("The vectors cannot be exactly opposing.")
+            # The vectors are exactly opposing
+            # We need to find a vector perpendicular to origin
+            # e1 will work almost always. Otherwise e2 will.
+            v2 = np.reshape((1.0,0,0), (3,1))
+            if abs(float(v2.T @ origin)) > 1 - 1e-8:
+                v2 = np.reshape((0,1.0,0), (3,1))
+            v2 = np.cross(origin, v2, axis=0) # This is perpendicular to origin and not zero
+            v2 = v2 / np.linalg.norm(v2)
+            # Rotating around v2 by pi rads will give the desired result
+            R = SO3.exp(np.pi * v2)
 
-        return SO3.from_matrix(mat)
+        else:
+            vx = SO3.skew(v)
+            mat = np.eye(3) + vx + (1 - c) / (s**2) * vx @ vx;
+            R = SO3.from_matrix(mat)
+
+        return R
 
 if __name__ == "__main__":
     R = SO3()
