@@ -84,6 +84,14 @@ class SIM3(LieGroup):
         return NotImplemented
 
     @staticmethod
+    def identity() -> 'SIM3':
+        result = SIM3()
+        result._R = SO3.identity()
+        result._x = R3.identity()
+        result._s = MR1.identity()
+        return result
+
+    @staticmethod
     def valid_list_formats():
         # Possible formats are
         # SO(3) format specs
