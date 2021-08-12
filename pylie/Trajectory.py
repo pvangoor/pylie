@@ -10,7 +10,7 @@ class Trajectory:
             self._elements = elements
 
         if times is None:
-            self._times = list(range(len(elements)))
+            self._times = list(range(len(self._elements)))
         else:
             self._times = times
         
@@ -24,20 +24,21 @@ class Trajectory:
         if isinstance(t, (int, float, complex)) and not isinstance(t, bool):
             # t is a number
             t = float(t)
-            next_idx = [j for j in range(len(self._times)) if self._times[j] > t]
-            if len(next_idx) == 0:
-                next_idx = len(self._times)-1
-            else:
-                next_idx = next_idx[0]
-            if next_idx == 0:
-                next_idx = 1
-            
+            i0, i1 = self._get_indices_near_time(t)
+            if i0 is None:
+                return None
+            elif i1 is None:
+                return self._elements[0]
+
             # Now (inter/extra)polate
-            base_element = self._elements[next_idx-1]
-            dt = self._times[next_idx] - self._times[next_idx-1]
-            motion = (base_element.inv() * self._elements[next_idx]).log() / dt
-            ndt = t - self._times[next_idx-1]
-            elem = base_element * base_element.exp(ndt * motion)
+            X0 = self._elements[i0]
+            t0 = self._times[i0]
+            X1 = self._elements[i1]
+            t1 = self._times[i1]
+
+            dt = t1 - t0
+            motion = (X0.inv() * X1).log() / dt
+            elem = X0 * X0.exp((t - t0) * motion)
             return elem
         
         elif isinstance(t, list):
@@ -50,17 +51,19 @@ class Trajectory:
         if isinstance(t, (int, float, complex)) and not isinstance(t, bool):
             # t is a number
             t = float(t)
-            next_idx = [j for j in range(len(self._times)) if self._times[j] > t]
-            if len(next_idx) == 0:
-                next_idx = len(self._times)-1
-            else:
-                next_idx = next_idx[0]
-            if next_idx == 0:
-                next_idx = 1
-            
+            i0, i1 = self._get_indices_near_time(t)
+            if i0 is None:
+                return None
+            elif i1 is None:
+                return self._elements[0].log() * 0.0
+
             # Now (inter/extra)polate
-            dt = self._times[next_idx] - self._times[next_idx-1]
-            motion = (self._elements[next_idx-1].inv() * self._elements[next_idx]).log() / dt
+            X0 = self._elements[i0]
+            t0 = self._times[i0]
+            X1 = self._elements[i1]
+            t1 = self._times[i1]
+            
+            motion = (X0.inv() * X1).log() / (t1 - t0)
 
             assert not np.isnan(motion).any()
             return motion
@@ -94,7 +97,7 @@ class Trajectory:
 
     def __mul__(self, other):
         if isinstance(other, self.group_type()):
-            self._elements = [X * other for X in self._elements]
+            new_elements = [X * other for X in self._elements]
             new_times = [t for t in self._times]
             return Trajectory(new_elements,new_times)
         raise NotImplementedError
@@ -126,6 +129,24 @@ class Trajectory:
             if self._times[i+1] - self._times[i] < 1e-8:
                 del self._times[i+1]
                 del self._elements[i+1]
+    
+    def _get_indices_near_time(self, t : float):
+        assert(isinstance(t, float))
+        if len(self._times) == 0:
+            return None, None
+        elif len(self._times) == 1:
+            return 0, None
+
+        next_idx = [j for j in range(len(self._times)) if self._times[j] > t]
+        if len(next_idx) == 0:
+            # There are no times after t
+            return len(self._times)-2, len(self._times)-1
+        elif next_idx[0] == 0:
+            # All times are after t
+            return 0, 1
+        else:
+            return next_idx[0]-1, next_idx[0]
+
 
 
 if __name__ == "__main__":

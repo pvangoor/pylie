@@ -10,7 +10,10 @@ def align_trajectory(trajectory0 : Trajectory, trajectory1 : Trajectory, ret_par
     t0 = max(trajectory0.begin_time(), trajectory1.begin_time())
     t1 = min(trajectory0.end_time(), trajectory1.end_time())
     if t0 >= t1:
-        return Trajectory()
+        if ret_params:
+            return Trajectory(), SIM3.identity()
+        else:
+            return Trajectory()
     
     num_points = 100
     times = np.linspace(t0, t1, num_points).tolist()
