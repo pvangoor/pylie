@@ -1,8 +1,9 @@
 import pylie
 import numpy as np
 
+
 class Trajectory:
-    def __init__(self, elements = None, times = None):
+    def __init__(self, elements=None, times=None):
         if elements is None:
             self._elements = []
             self._times = []
@@ -13,9 +14,9 @@ class Trajectory:
             self._times = list(range(len(self._elements)))
         else:
             self._times = times
-        
+
         self._clean_duplicates()
-    
+
     def __len__(self):
         assert len(self._elements) == len(self._times)
         return len(self._elements)
@@ -40,7 +41,7 @@ class Trajectory:
             motion = (X0.inv() * X1).log() / dt
             elem = X0 * X0.exp((t - t0) * motion)
             return elem
-        
+
         elif isinstance(t, list):
             # t is a list of numbers -> return the corresponding trajectory
             return Trajectory([self[tau] for tau in t], t)
@@ -62,7 +63,7 @@ class Trajectory:
             t0 = self._times[i0]
             X1 = self._elements[i1]
             t1 = self._times[i1]
-            
+
             motion = (X0.inv() * X1).log() / (t1 - t0)
 
             assert not np.isnan(motion).any()
@@ -70,15 +71,21 @@ class Trajectory:
 
         raise NotImplementedError
 
+    def get_velocities(self):
+        vels = [
+            (self._elements[i].inv() * self._elements[i+1]).log() / (self._times[i+1] - self._times[i]) for i in range(len(self)-1)
+        ]
+        return vels
+
     def begin_time(self):
         return self._times[0]
-    
+
     def end_time(self):
         return self._times[-1]
-    
+
     def get_elements(self):
         return self._elements
-    
+
     def get_times(self):
         return self._times
 
@@ -87,21 +94,21 @@ class Trajectory:
             return type(self._elements[0])
         else:
             return None
-    
+
     def __rmul__(self, other):
         if isinstance(other, self.group_type()):
             new_elements = [other * X for X in self._elements]
             new_times = [t for t in self._times]
-            return Trajectory(new_elements,new_times)
+            return Trajectory(new_elements, new_times)
         raise NotImplementedError
 
     def __mul__(self, other):
         if isinstance(other, self.group_type()):
             new_elements = [X * other for X in self._elements]
             new_times = [t for t in self._times]
-            return Trajectory(new_elements,new_times)
+            return Trajectory(new_elements, new_times)
         raise NotImplementedError
-    
+
     def truncate(self, t0, t1):
         assert t0 < t1
 
@@ -113,24 +120,25 @@ class Trajectory:
             self._elements.clear()
             return
 
-        idx1 = [j for j in reversed(range(len(self._times))) if self._times[j] <= t1]
+        idx1 = [j for j in reversed(
+            range(len(self._times))) if self._times[j] <= t1]
         if len(idx1) > 0:
             idx1 = idx1[0]
         else:
             self._times.clear()
             self._elements.clear()
             return
-        
+
         self._times = self._times[idx0:idx1]
         self._elements = self._elements[idx0:idx1]
-    
+
     def _clean_duplicates(self):
         for i in reversed(range(len(self._times)-1)):
             if self._times[i+1] - self._times[i] < 1e-8:
                 del self._times[i+1]
                 del self._elements[i+1]
-    
-    def _get_indices_near_time(self, t : float):
+
+    def _get_indices_near_time(self, t: float):
         assert(isinstance(t, float))
         if len(self._times) == 0:
             return None, None
@@ -148,11 +156,10 @@ class Trajectory:
             return next_idx[0]-1, next_idx[0]
 
 
-
 if __name__ == "__main__":
     import numpy as np
     times = [i * 0.1 for i in range(10)]
-    motion = np.random.randn(3,1)
+    motion = np.random.randn(3, 1)
     elements = [pylie.SO3.exp(motion*t) for t in times]
     traj = Trajectory(elements, times)
 
@@ -161,4 +168,3 @@ if __name__ == "__main__":
         group_error = traj[t] / pylie.SO3.exp(t*motion)
         norm_error = np.linalg.norm(group_error.as_matrix() - np.eye(3))
         print("The error at time {} is {}".format(t, norm_error))
-        

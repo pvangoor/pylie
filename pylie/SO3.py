@@ -21,6 +21,9 @@ class SO3(LieGroup):
 
     def as_quaternion(self) -> np.ndarray:
         return self._rot.as_quat()
+    
+    def as_euler(self) -> np.ndarray:
+        return self._rot.as_euler('xyz')
 
     def __str__(self):
         return str(self._rot.as_matrix())
