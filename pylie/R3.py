@@ -35,7 +35,12 @@ class R3(LieGroup):
                 return other + self._trans
             elif other.shape[0] == 4:
                 return self.as_matrix() @ other
+        elif isinstance(other, float):
+            return R3(self._trans * other)
         return NotImplemented
+    
+    def __rmul__(self, other):
+        return self.__mul__(other)
     
     def __add__(self, other):
         return self * other
