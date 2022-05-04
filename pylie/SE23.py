@@ -37,7 +37,7 @@ class SE23(LieGroup):
         Ad[0:3,0:3] = R
         Ad[3:6,0:3] = SO3.skew(self.x().as_vector()) @ R
         Ad[3:6,3:6] = R
-        Ad[6:9,3:6] = SO3.skew(self.w().as_vector()) @ R
+        Ad[6:9,0:3] = SO3.skew(self.w().as_vector()) @ R
         Ad[6:9,6:9] = R
         return Ad
     
@@ -52,7 +52,7 @@ class SE23(LieGroup):
         ad[0:3,0:3] = OmegaCross
         ad[3:6,0:3] = VCross
         ad[3:6,3:6] = OmegaCross
-        ad[6:9,3:6] = ACross
+        ad[6:9,0:3] = ACross
         ad[6:9,6:9] = OmegaCross
         return ad
     
