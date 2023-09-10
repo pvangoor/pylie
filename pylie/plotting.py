@@ -41,7 +41,7 @@ class frameArtist(Artist):
         Q, t = self._pose_to_Qt(pose)
         for a in range(3):
             self._frame_lines[a].set_data_3d([t[0,0], t[0,0]+Q[0,a]], [t[1,0], t[1,0]+Q[1,a]], [t[2,0], t[2,0]+Q[2,a]])
-        self._frame_center.set_data_3d(t[0,0], t[1,0], t[2,0])
+        self._frame_center.set_data_3d([t[0,0]], [t[1,0]], [t[2,0]])
 
     
     @staticmethod
