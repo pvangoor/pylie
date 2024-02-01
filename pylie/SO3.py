@@ -57,7 +57,7 @@ class SO3(LieGroup):
         return result
     
     def log(self):
-        return np.reshape(self._rot.as_rotvec(), (3,1))
+        return np.reshape(self._rot.as_rotvec(), 3)
     
     def as_matrix(self):
         return self._rot.as_matrix()
@@ -81,7 +81,7 @@ class SO3(LieGroup):
 
     @staticmethod
     def exp(so3vec):
-        assert so3vec.shape == (3,1), "Invalid shape of Lie algebra vector."
+        assert len(so3vec) == 3, "The so(3) Lie algebra vector must have 3 elements."
         result = SO3()
         result._rot = Rotation.from_rotvec(so3vec.ravel())
         return result
@@ -169,11 +169,11 @@ class SO3(LieGroup):
     def wedge(vec : np.ndarray) -> np.ndarray:
         if not isinstance(vec, np.ndarray):
             raise TypeError
-        if not vec.shape == (3,1):
+        if not len(vec) == 3:
             raise ValueError
-        mat = np.array([[      0.0, -vec[2,0],  vec[1,0]],
-                        [ vec[2,0],       0.0, -vec[0,0]],
-                        [-vec[1,0],  vec[0,0],       0.0]])
+        mat = np.array([[      0.0, -vec.item(2),  vec.item(1)],
+                        [ vec.item(2),       0.0, -vec.item(0)],
+                        [-vec.item(1),  vec.item(0),       0.0]])
         return mat
     
     @staticmethod

@@ -44,11 +44,11 @@ class SE23(LieGroup):
     @staticmethod
     def adjoint(se23vec : np.ndarray) -> np.ndarray:
         assert isinstance(se23vec, np.ndarray)
-        assert se23vec.shape == (9,1)
+        assert len(se23vec) == 9
         ad = np.zeros((9,9))
-        OmegaCross = SO3.skew(se23vec[0:3,:])
-        VCross = SO3.skew(se23vec[3:6,:])
-        ACross = SO3.skew(se23vec[6:9,:])
+        OmegaCross = SO3.skew(se23vec.ravel()[0:3])
+        VCross = SO3.skew(se23vec.ravel()[3:6])
+        ACross = SO3.skew(se23vec.ravel()[6:9])
         ad[0:3,0:3] = OmegaCross
         ad[3:6,0:3] = VCross
         ad[3:6,3:6] = OmegaCross
@@ -115,10 +115,10 @@ class SE23(LieGroup):
             raise TypeError
         if se3arr.shape == (5,5):
             se3arr = SE23.vee(se3arr)
-        elif not se3arr.shape == (9,1):
+        elif not len(se3arr) == 9:
             raise ValueError
 
-        w = se3arr[0:3,0:1]
+        w = se3arr.ravel()[0:3]
         theta = np.linalg.norm(w)
 
         if theta > 1e-6:
@@ -135,8 +135,8 @@ class SE23(LieGroup):
         R = np.eye(3) + A * wx + B * wx2
         V = np.eye(3) + B * wx + C * wx2
 
-        u1 = se3arr[3:6,0:1]
-        u2 = se3arr[6:9,0:1]
+        u1 = se3arr.ravel()[3:6]
+        u2 = se3arr.ravel()[6:9]
         result = SE23(R, V@u1, V@u2)
 
         return result
@@ -241,12 +241,12 @@ class SE23(LieGroup):
     def wedge(vec : np.ndarray) -> np.ndarray:
         if not isinstance(vec, np.ndarray):
             raise TypeError
-        if not vec.shape == (9,1):
+        if not len(vec) == 9:
             raise ValueError
         mat = np.zeros((5,5))
-        mat[0:3,0:3] = SO3.skew(vec[0:3,0:1])
-        mat[0:3,3:4] = vec[3:6, 0:1]
-        mat[0:3,4:5] = vec[6:9, 0:1]
+        mat[0:3,0:3] = SO3.skew(vec.ravel()[0:3])
+        mat[0:3,3:4] = vec.ravel()[3:6]
+        mat[0:3,4:5] = vec.ravel()[6:9]
         return mat
 
 if __name__ == "__main__":

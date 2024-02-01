@@ -8,13 +8,13 @@ class R3(LieGroup):
     # [  0   1 ]
     def __init__(self, x = None):
         if x is None:
-            self._trans = np.zeros((3,1))
+            self._trans = np.zeros(3)
         elif isinstance(x, R3):
             self._trans = x._trans
         elif isinstance(x, np.ndarray) or isinstance(x ,list):
-            self._trans = np.reshape(x, (3,1))
+            self._trans = np.reshape(x, 3)
         else:
-            self._trans = np.zeros((3,1))
+            self._trans = np.zeros(3)
     
     def x(self) -> np.ndarray:
         return self._trans
@@ -77,12 +77,12 @@ class R3(LieGroup):
     @staticmethod
     def identity():
         result = R3()
-        result._trans = np.zeros((3,1))
+        result._trans = np.zeros(3)
         return result
 
     @staticmethod
     def exp(tr3vec):
-        assert tr3vec.shape == (3,1), "Invalid shape of Lie algebra vector."
+        assert len(tr3vec) == (3), "Invalid shape of Lie algebra vector."
         result = R3()
         result._trans = tr3vec
         return result
@@ -97,7 +97,7 @@ class R3(LieGroup):
     def from_list(line, format_spec="x") -> 'R3':
         result = R3()
         if format_spec == "x":
-            result._trans = np.reshape(np.array([float(line[i]) for i in range(3)]), (3,1))
+            result._trans = np.reshape(np.array([float(line[i]) for i in range(3)]), 3)
             line = line[3:]
         else:
             return NotImplemented

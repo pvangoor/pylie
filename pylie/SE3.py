@@ -32,10 +32,10 @@ class SE3(LieGroup):
     @staticmethod
     def adjoint(se3vec : np.ndarray) -> np.ndarray:
         assert isinstance(se3vec, np.ndarray)
-        assert se3vec.shape == (6,1)
+        assert len(se3vec) == 6
         ad = np.zeros((6,6))
-        OmegaCross = SO3.skew(se3vec[0:3,:])
-        VCross = SO3.skew(se3vec[3:6,:])
+        OmegaCross = SO3.skew(se3vec.ravel()[0:3])
+        VCross = SO3.skew(se3vec.ravel()[3:6])
         ad[0:3,0:3] = OmegaCross
         ad[3:6,0:3] = VCross
         ad[3:6,3:6] = OmegaCross
@@ -97,11 +97,11 @@ class SE3(LieGroup):
             raise TypeError
         if se3arr.shape == (4,4):
             se3arr = SE3.vee(se3arr)
-        elif not se3arr.shape == (6,1):
+        elif not len(se3arr) == 6:
             raise ValueError
 
-        w = se3arr[0:3,0:1]
-        u = se3arr[3:6,0:1]
+        w = se3arr.ravel()[0:3]
+        u = se3arr.ravel()[3:6]
         theta = np.linalg.norm(w)
 
         if theta > 1e-6:
@@ -213,11 +213,11 @@ class SE3(LieGroup):
     def wedge(vec : np.ndarray) -> np.ndarray:
         if not isinstance(vec, np.ndarray):
             raise TypeError
-        if not vec.shape == (6,1):
+        if not len(vec) == 6:
             raise ValueError
         mat = np.zeros((4,4))
-        mat[0:3,0:3] = SO3.skew(vec[0:3,0:1])
-        mat[0:3,3:4] = vec[3:6, 0:1]
+        mat[0:3,0:3] = SO3.skew(vec.ravel()[0:3])
+        mat[0:3,3] = vec.ravel()[3:6]
         return mat
 
 if __name__ == "__main__":

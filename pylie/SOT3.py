@@ -85,10 +85,10 @@ class SOT3(LieGroup):
             raise TypeError
         if sot3arr.shape == (4,4):
             sot3arr = SOT3.vee(sot3arr)
-        elif not sot3arr.shape == (4,1):
+        elif not len(sot3arr) == 4:
             raise ValueError
 
-        result = SOT3(SO3.exp(sot3arr[0:3,0:1]), np.exp(sot3arr[3,0]))
+        result = SOT3(SO3.exp(sot3arr.ravel()[0:3]), np.exp(sot3arr.item(3)))
 
         return result
     
@@ -165,18 +165,18 @@ class SOT3(LieGroup):
             raise TypeError
         if not mat.shape == (3,3):
             raise ValueError
-        vec = np.zeros((4,1))
-        vec[0:3,:] = SO3.vex(mat)
-        vec[3,0] = mat[0,0]
+        vec = np.zeros(4)
+        vec[0:3] = SO3.vex(mat)
+        vec[3] = mat[0,0]
         return vec
 
     @staticmethod
     def wedge(vec : np.ndarray) -> np.ndarray:
         if not isinstance(vec, np.ndarray):
             raise TypeError
-        if not vec.shape == (4,1):
+        if not len(vec) == 4:
             raise ValueError
-        result = SO3.skew(vec[0:3,:]) + np.identity(3) * vec[3,0]
+        result = SO3.skew(vec.ravel()[0:3]) + np.identity(3) * vec.item(3)
         return result
 
 if __name__ == "__main__":
