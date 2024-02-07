@@ -3,3 +3,4 @@ dist/*
 pylie.egg-info/*
 pylie/__pycache__/*
 pylie/tests/__pycache__/*
+.vscode/*

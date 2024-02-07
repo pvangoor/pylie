@@ -4,6 +4,7 @@ from .MR1 import MR1 as MR1
 import numpy as np
 
 class SOT3(LieGroup):
+    DIM = 4
     def __init__(self, R : SO3 = None, s : MR1 = None):
         if R is None:
             R = SO3()
@@ -22,7 +23,9 @@ class SOT3(LieGroup):
         return str(self.as_matrix())
     
     def Adjoint(self):
-        return NotImplemented
+        ad = np.eye(4)
+        ad[0:3,0:3] = self._R.as_matrix()
+        return ad
     
     def __mul__(self, other):
         if isinstance(other, SOT3):
@@ -95,7 +98,7 @@ class SOT3(LieGroup):
     def log(self) -> np.ndarray:
         w = self._R.log()
         a = self._s.log()
-        return np.vstack((w,a))
+        return np.concatenate((w,(a,)))
 
     @staticmethod
     def valid_list_formats() -> dict:

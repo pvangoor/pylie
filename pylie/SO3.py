@@ -5,6 +5,7 @@ from scipy.spatial.transform import Rotation
 import numpy as np
 
 class SO3(LieGroup):
+    DIM = 3
     def __init__(self, R = None):
         self._rot = Rotation.identity()
         if isinstance(R, np.ndarray):

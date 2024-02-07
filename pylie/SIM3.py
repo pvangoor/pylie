@@ -54,7 +54,7 @@ class SIM3(LieGroup):
     def as_matrix(self):
         mat = np.eye(4)
         mat[0:3, 0:3] = self._s._scale * self._R.as_matrix()
-        mat[0:3, 3:4] = self._x._trans
+        mat[0:3, 3] = self._x._trans
         return mat
     
     def to_SE3(self):

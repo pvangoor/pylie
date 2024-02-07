@@ -5,6 +5,7 @@ from .R3 import R3 as R3
 import numpy as np
 
 class SE23(LieGroup):
+    DIM = 9
     def __init__(self, R : SO3 = None, x : R3 = None, w : R3 = None):
         if R is None:
             R = SO3()
@@ -80,8 +81,8 @@ class SE23(LieGroup):
     def as_matrix(self) -> np.ndarray:
         mat = np.eye(5)
         mat[0:3,0:3] = self._R.as_matrix()
-        mat[0:3,3:4] = self._x.as_vector()
-        mat[0:3,4:5] = self._w.as_vector()
+        mat[0:3,3] = self._x.as_vector()
+        mat[0:3,4] = self._w.as_vector()
         return mat
 
     @staticmethod
@@ -151,7 +152,7 @@ class SE23(LieGroup):
             Vinv = np.eye(3) - 0.5*wx
         u1 = Vinv @ self._x.as_vector()
         u2 = Vinv @ self._w.as_vector()
-        return np.vstack((w,u1,u2))
+        return np.concatenate((w,u1,u2))
 
     @staticmethod
     def valid_list_formats() -> dict:
@@ -232,9 +233,9 @@ class SE23(LieGroup):
         if not mat.shape == (5,5):
             raise ValueError
         vecOmega = SO3.vex(mat[0:3,0:3])
-        vecV = mat[0:3,3:4]
-        vecA = mat[0:3,4:5]
-        vec = np.vstack((vecOmega, vecV, vecA))
+        vecV = mat[0:3,3]
+        vecA = mat[0:3,4]
+        vec = np.concatenate((vecOmega, vecV, vecA))
         return vec
 
     @staticmethod
@@ -245,8 +246,8 @@ class SE23(LieGroup):
             raise ValueError
         mat = np.zeros((5,5))
         mat[0:3,0:3] = SO3.skew(vec.ravel()[0:3])
-        mat[0:3,3:4] = vec.ravel()[3:6]
-        mat[0:3,4:5] = vec.ravel()[6:9]
+        mat[0:3,3] = vec.ravel()[3:6]
+        mat[0:3,4] = vec.ravel()[6:9]
         return mat
 
 if __name__ == "__main__":

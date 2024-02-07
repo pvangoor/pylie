@@ -4,6 +4,7 @@ from .R3 import R3 as R3
 import numpy as np
 
 class SE3(LieGroup):
+    DIM = 6
     def __init__(self, R : SO3 = None, x : R3 = None):
         if R is None:
             R = SO3()
@@ -65,7 +66,7 @@ class SE3(LieGroup):
     def as_matrix(self) -> np.ndarray:
         mat = np.eye(4)
         mat[0:3,0:3] = self._R.as_matrix()
-        mat[0:3,3:4] = self._x.as_vector()
+        mat[0:3,3] = self._x.as_vector()
         return mat
 
     @staticmethod
@@ -77,7 +78,7 @@ class SE3(LieGroup):
         
         result = SE3()
         result._R = SO3.from_matrix(mat[0:3,0:3])
-        result._x._trans = mat[0:3,3:4]
+        result._x._trans = mat[0:3,3]
         return result
     
     def __truediv__(self, other) -> 'SE3':
@@ -118,7 +119,9 @@ class SE3(LieGroup):
         R = np.eye(3) + A * wx + B * wx2
         V = np.eye(3) + B * wx + C * wx2
 
-        mat = np.block([[R, V@u],[np.zeros((1,4))]])
+        mat = np.eye(4)
+        mat[0:3,0:3] = R
+        mat[0:3,3] = V @ u
         result = SE3.from_matrix(mat)
 
         return result
@@ -132,7 +135,7 @@ class SE3(LieGroup):
         else:
             Vinv = np.eye(3) - 0.5*wx
         u = Vinv @ self._x._trans
-        return np.vstack((w,u))
+        return np.concatenate((w,u))
 
     @staticmethod
     def valid_list_formats() -> dict:
@@ -160,7 +163,7 @@ class SE3(LieGroup):
             elif fspec == "P":
                 mat = np.reshape(np.array([float(line[i]) for i in range(12)]), (3,4))
                 result._R._rot = result._R._rot.from_matrix(mat[0:3,0:3])
-                result._x._trans = mat[0:3,3:4]
+                result._x._trans = mat[0:3,3]
                 line = line[12:]
             else:
                 return NotImplemented
@@ -205,8 +208,8 @@ class SE3(LieGroup):
         if not mat.shape == (4,4):
             raise ValueError
         vecOmega = SO3.vex(mat[0:3,0:3])
-        vecV = mat[0:3,3:4]
-        vec = np.vstack((vecOmega, vecV))
+        vecV = mat[0:3,3]
+        vec = np.concatenate((vecOmega, vecV))
         return vec
 
     @staticmethod
