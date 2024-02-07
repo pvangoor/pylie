@@ -82,7 +82,7 @@ class R3(LieGroup):
 
     @staticmethod
     def exp(tr3vec):
-        assert len(tr3vec) == (3), "Invalid shape of Lie algebra vector."
+        assert tr3vec.size == (3), "Invalid shape of Lie algebra vector."
         result = R3()
         result._trans = tr3vec
         return result

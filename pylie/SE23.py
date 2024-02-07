@@ -44,7 +44,7 @@ class SE23(LieGroup):
     @staticmethod
     def adjoint(se23vec : np.ndarray) -> np.ndarray:
         assert isinstance(se23vec, np.ndarray)
-        assert len(se23vec) == 9
+        assert se23vec.size == 9
         ad = np.zeros((9,9))
         OmegaCross = SO3.skew(se23vec.ravel()[0:3])
         VCross = SO3.skew(se23vec.ravel()[3:6])
@@ -115,7 +115,7 @@ class SE23(LieGroup):
             raise TypeError
         if se3arr.shape == (5,5):
             se3arr = SE23.vee(se3arr)
-        elif not len(se3arr) == 9:
+        elif not se3arr.size == 9:
             raise ValueError
 
         w = se3arr.ravel()[0:3]
@@ -241,7 +241,7 @@ class SE23(LieGroup):
     def wedge(vec : np.ndarray) -> np.ndarray:
         if not isinstance(vec, np.ndarray):
             raise TypeError
-        if not len(vec) == 9:
+        if not vec.size == 9:
             raise ValueError
         mat = np.zeros((5,5))
         mat[0:3,0:3] = SO3.skew(vec.ravel()[0:3])

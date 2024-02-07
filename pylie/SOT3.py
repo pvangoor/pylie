@@ -85,7 +85,7 @@ class SOT3(LieGroup):
             raise TypeError
         if sot3arr.shape == (4,4):
             sot3arr = SOT3.vee(sot3arr)
-        elif not len(sot3arr) == 4:
+        elif not sot3arr.size == 4:
             raise ValueError
 
         result = SOT3(SO3.exp(sot3arr.ravel()[0:3]), np.exp(sot3arr.item(3)))
@@ -174,7 +174,7 @@ class SOT3(LieGroup):
     def wedge(vec : np.ndarray) -> np.ndarray:
         if not isinstance(vec, np.ndarray):
             raise TypeError
-        if not len(vec) == 4:
+        if not vec.size == 4:
             raise ValueError
         result = SO3.skew(vec.ravel()[0:3]) + np.identity(3) * vec.item(3)
         return result

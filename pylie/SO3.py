@@ -81,7 +81,7 @@ class SO3(LieGroup):
 
     @staticmethod
     def exp(so3vec):
-        assert len(so3vec) == 3, "The so(3) Lie algebra vector must have 3 elements."
+        assert so3vec.size == 3, "The so(3) Lie algebra vector must have 3 elements."
         result = SO3()
         result._rot = Rotation.from_rotvec(so3vec.ravel())
         return result
@@ -169,7 +169,7 @@ class SO3(LieGroup):
     def wedge(vec : np.ndarray) -> np.ndarray:
         if not isinstance(vec, np.ndarray):
             raise TypeError
-        if not len(vec) == 3:
+        if not vec.size == 3:
             raise ValueError
         mat = np.array([[      0.0, -vec.item(2),  vec.item(1)],
                         [ vec.item(2),       0.0, -vec.item(0)],

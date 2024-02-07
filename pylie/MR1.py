@@ -81,7 +81,7 @@ class MR1(LieGroup):
     @staticmethod
     def exp(tr3vec):
         if isinstance(tr3vec, np.ndarray):
-            assert len(tr3vec) == 1, "The Lie algebra element should hold only 1 element."
+            assert tr3vec.size == 1, "The Lie algebra element should hold only 1 element."
             tr3vec = float(tr3vec)
         result = MR1()
         result._scale = np.exp(tr3vec)
