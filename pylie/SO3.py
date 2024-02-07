@@ -156,9 +156,9 @@ class SO3(LieGroup):
             raise TypeError
         if not mat.shape == (3,3):
             raise ValueError
-        vec = np.array([[mat[2,1]],
-                        [mat[0,2]],
-                        [mat[1,0]]])
+        vec = np.array([mat[2,1],
+                        mat[0,2],
+                        mat[1,0]])
         return vec
     
     @staticmethod

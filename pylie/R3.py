@@ -97,7 +97,7 @@ class R3(LieGroup):
     def from_list(line, format_spec="x") -> 'R3':
         result = R3()
         if format_spec == "x":
-            result._trans = np.reshape(np.array([float(line[i]) for i in range(3)]), 3)
+            result._trans = np.array([float(line[i]) for i in range(3)])
             line = line[3:]
         else:
             return NotImplemented

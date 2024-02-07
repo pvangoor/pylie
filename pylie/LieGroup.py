@@ -12,6 +12,14 @@ class LieGroup(ABC):
     def __mul__(self, other):
         pass
     
+    def __pow__(self, n):
+        if isinstance(n, int) and n >= 0:
+            result = self.identity()
+            for _ in range(n):
+                result = result * self
+            return result
+        return NotImplemented
+
     def __matmul__(self, other):
         if isinstance(other, LieGroup):
             return self.as_matrix() @ other.as_matrix()
