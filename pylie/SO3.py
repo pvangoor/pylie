@@ -1,4 +1,4 @@
-from numpy.lib.arraysetops import isin
+
 from .LieGroup import LieGroup
 from .R3 import R3 as R3
 from scipy.spatial.transform import Rotation

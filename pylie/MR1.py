@@ -1,4 +1,4 @@
-from numpy.lib.arraysetops import isin
+
 from .LieGroup import LieGroup
 import numpy as np
 from .R3 import R3 as R3
