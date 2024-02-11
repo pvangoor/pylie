@@ -46,7 +46,7 @@ class Quaternion(LieGroup):
         if isinstance(other, Quaternion):
             q3 = np.zeros(4)
             q3[0] = self._quat[0]*other._quat[0] - self._quat[1:] @ other._quat[1:]
-            q3[1:] = self._quat[0]*other._quat[1:] + other._quat[0]*self._quat[1:] - np.cross(self._quat[1:], other._quat[1:])
+            q3[1:] = self._quat[0]*other._quat[1:] + other._quat[0]*self._quat[1:] + np.cross(self._quat[1:], other._quat[1:])
             return Quaternion(q3)
         elif isinstance(other, np.ndarray) and other.size == 3:
             other_q = np.zeros(4)
@@ -94,7 +94,7 @@ class Quaternion(LieGroup):
             (-q[1], q[0], -q[3], q[2]),
             (-q[2], q[3], q[0], -q[1]),
             (-q[3],-q[2],q[1],q[0])
-        )).T
+        ))
         return mat
 
     @staticmethod
@@ -103,7 +103,7 @@ class Quaternion(LieGroup):
             raise TypeError
         if not mat.shape == (4,4):
             raise ValueError
-        return Quaternion(mat[:,0])
+        return Quaternion(mat[0,:])
     
     @staticmethod
     def identity():
@@ -169,7 +169,7 @@ class Quaternion(LieGroup):
             raise TypeError
         if not mat.shape == (4,4):
             raise ValueError
-        return mat[:,0]
+        return mat[0,:]
 
     @staticmethod
     def wedge(vec : np.ndarray) -> np.ndarray:
