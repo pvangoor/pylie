@@ -35,11 +35,12 @@ class Quaternion(LieGroup):
         return str(self._quat)
     
     def Adjoint(self):
-        # TODO: Implement a more efficient version
-        Ad = np.empty((4,4))
-        for i in range(4):
-            ei = np.zeros(4); ei[i] = 1.
-            Ad[:,i] = (self * Quaternion(ei) * self.inv()).as_vector()
+        norm2_q = np.inner(self._quat, self._quat)
+        r = self._quat[0]
+        u = self._quat[1:]
+        Ad = np.zeros((4,4))
+        Ad[0,0] = 1.
+        Ad[1:,1:] = np.eye(3) +2* (r*SO3.skew(u) + SO3.skew(u)@ SO3.skew(u)) / norm2_q
         return Ad
     
     def __mul__(self, other):
