@@ -76,16 +76,16 @@ class Quaternion(LieGroup):
     
     def log(self):
         r = self._quat[0]
-        v = self._quat[1:]
+        u = self._quat[1:]
         norm = np.linalg.norm(self._quat)
         if norm == 0:
             return np.nan * np.empty(4)
         result = np.zeros(4)
         result[0] = np.log(norm)
-        norm_v = np.linalg.norm(v)
-        if norm_v == 0:
+        norm_u = np.linalg.norm(u)
+        if norm_u == 0:
             return result
-        result[1:] = np.arccos(r/norm) * v / norm_v
+        result[1:] = np.arctan(norm_u / r) * u / norm_u
         return result
     
     def as_matrix(self):
