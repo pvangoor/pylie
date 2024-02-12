@@ -27,6 +27,14 @@ class SOT3(LieGroup):
         ad[0:3,0:3] = self._R.as_matrix()
         return ad
     
+    @staticmethod
+    def adjoint(sot3vec : np.ndarray) -> np.ndarray:
+        assert isinstance(sot3vec, np.ndarray)
+        assert sot3vec.size == 4
+        ad = np.zeros((4,4))
+        ad[:3,:3] = SO3.skew(sot3vec[:3])
+        return ad
+
     def __mul__(self, other):
         if isinstance(other, SOT3):
             result = SOT3()

@@ -40,6 +40,10 @@ class LieGroup(ABC):
     
     def Adjoint(self):
         raise NotImplementedError()
+    
+    @staticmethod
+    def adjoint(lie_alg_vector):
+        return NotImplementedError()
 
     def as_matrix(self):
         raise NotImplementedError()

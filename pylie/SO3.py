@@ -15,8 +15,12 @@ class SO3(LieGroup):
         elif isinstance(R, Rotation):
             self._rot = R
             
-        
-    
+    @staticmethod
+    def adjoint(so3vec : np.ndarray) -> np.ndarray:
+        assert isinstance(so3vec, np.ndarray)
+        assert so3vec.size == 3
+        return SO3.skew(so3vec)
+            
     def R(self) -> np.ndarray:
         return self._rot.as_matrix()
 

@@ -15,6 +15,10 @@ class MR1(LieGroup):
     def Adjoint(self):
         return np.eye(1)
     
+    @staticmethod
+    def adjoint(mr1vec):
+        return np.array([[0]])
+    
     def __mul__(self, other):
         if isinstance(other, MR1):
             result = MR1()
@@ -79,12 +83,12 @@ class MR1(LieGroup):
         return result
 
     @staticmethod
-    def exp(tr3vec):
-        if isinstance(tr3vec, np.ndarray):
-            assert tr3vec.size == 1, "The Lie algebra element should hold only 1 element."
-            tr3vec = float(tr3vec)
+    def exp(mr1vec):
+        if isinstance(mr1vec, np.ndarray):
+            assert mr1vec.size == 1, "The Lie algebra element should hold only 1 element."
+            mr1vec = float(mr1vec)
         result = MR1()
-        result._scale = np.exp(tr3vec)
+        result._scale = np.exp(mr1vec)
         return result
 
     @staticmethod

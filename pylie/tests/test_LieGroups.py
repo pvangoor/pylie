@@ -118,6 +118,13 @@ class Testself(unittest.TestCase):
             v2 = self.Grp.vee(logm(X1))
 
             np.testing.assert_almost_equal(v1, v2)
+    
+    def test_matrix_adjoint(self):
+        for _ in range(RND_REPS):
+            v1, v2 = self.rnd_v(2)
+            u1 = self.Grp.adjoint(v1) @ v2
+            u2 = self.Grp.vee(self.Grp.wedge(v1) @ self.Grp.wedge(v2) - self.Grp.wedge(v2) @ self.Grp.wedge(v1))
+            np.testing.assert_almost_equal(u1, u2)
             
     
 class TestSE3(Testself):

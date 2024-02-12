@@ -43,6 +43,14 @@ class Quaternion(LieGroup):
         Ad[1:,1:] = np.eye(3) +2* (r*SO3.skew(u) + SO3.skew(u)@ SO3.skew(u)) / norm2_q
         return Ad
     
+    @staticmethod
+    def adjoint(quat_vec : np.ndarray) -> np.ndarray:
+        assert isinstance(quat_vec, np.ndarray)
+        assert quat_vec.size == 4
+        ad = np.zeros((4,4))
+        ad[1:,1:] = 2*SO3.skew(quat_vec[1:])
+        return ad
+    
     def __mul__(self, other):
         if isinstance(other, Quaternion):
             q3 = np.zeros(4)
