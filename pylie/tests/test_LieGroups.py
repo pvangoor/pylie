@@ -37,9 +37,8 @@ class Testself(unittest.TestCase):
             I = self.Grp.identity()
             np.testing.assert_almost_equal(X.as_matrix(), (X*I).as_matrix())
             np.testing.assert_almost_equal(X.as_matrix(), (I*X).as_matrix())
-            np.testing.assert_almost_equal(I.as_matrix(), np.eye(*I.as_matrix().shape))
 
-    def test_associativity(self):
+    def test_product(self):
         for _ in range(RND_REPS):
             X1,X2,X3 = self.rnd_X(3)
             Y1 = (X1*X2)*X3
@@ -59,18 +58,29 @@ class Testself(unittest.TestCase):
             Y1 = X.inv().as_matrix()
             Y2 = np.linalg.inv(X.as_matrix())
             np.testing.assert_almost_equal(Y1, Y2)
+    
+    def test_matrix_identity(self):
+        for _ in range(RND_REPS):
+            I = self.Grp.identity().as_matrix()
+            np.testing.assert_almost_equal(I, np.eye(*I.shape))
 
     def test_Adjoint(self):
         for _ in range(RND_REPS):
             X = self.rnd_X()
             v = self.rnd_v()
             u1 = X.Adjoint() @ v
-            u2 = self.Grp.vee(X.as_matrix() @ self.Grp.wedge(v) @ X.inv().as_matrix())
-            np.testing.assert_almost_equal(u1, u2)
 
             Y1 = X * self.Grp.exp(v) * X.inv()
             Y2 = self.Grp.exp(u1)
             np.testing.assert_almost_equal(Y1.as_matrix(), Y2.as_matrix())
+    
+    def test_matrix_Adjoint(self):
+        for _ in range(RND_REPS):
+            X = self.rnd_X()
+            v = self.rnd_v()
+            u1 = X.Adjoint() @ v
+            u2 = self.Grp.vee(X.as_matrix() @ self.Grp.wedge(v) @ X.inv().as_matrix())
+            np.testing.assert_almost_equal(u1, u2)
 
     
     def test_inverse(self):
