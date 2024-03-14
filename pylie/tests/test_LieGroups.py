@@ -3,6 +3,7 @@ from ..SE3 import SE3 as SE3
 from ..SOT3 import SOT3 as SOT3
 from ..SE23 import SE23 as SE23
 from ..Quaternion import Quaternion as Quaternion
+from ..SE2 import SE2 as SE2
 
 import numpy as np
 from scipy.linalg import expm, logm
@@ -138,6 +139,9 @@ class TestSE23(Testself):
 
 class TestQuaternion(Testself):
     Grp = Quaternion
+
+class TestSE2(Testself):
+    Grp = SE2
 
 if __name__ == '__main__':
     unittest.main()
