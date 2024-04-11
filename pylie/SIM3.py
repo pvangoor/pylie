@@ -7,6 +7,7 @@ import numpy as np
 
 
 class SIM3(LieGroup):
+    DIM = 7
     # SIM(3) is defined with the matrix form
     # [ sR x ]
     # [ 0  1 ]

@@ -6,6 +6,8 @@ from .SE23 import SE23
 from .SIM3 import SIM3
 from .MR1 import MR1
 from .R3 import R3
+from .SE2 import SE2
+from .Quaternion import Quaternion
 from .Trajectory import Trajectory
 from . import analysis
 from . import plotting
