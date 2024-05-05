@@ -93,25 +93,35 @@ class SL2(LieGroup):
         b = U.item(1)
         c = U.item(2)
 
-        theta = np.emath.sqrt(a**2 + b*c)
-        if abs(theta) > 1e-6:
-            A = np.sinh(theta)/theta
+        theta = a**2 + b*c
+        if theta > 1e-8:
+            theta_sqrt = np.sqrt(theta)
+            A = np.cosh(theta_sqrt)
+            B = np.sinh(theta_sqrt)/theta_sqrt
+        elif theta < -1e-8:
+            theta_sqrt = np.sqrt(-theta)
+            A = np.cos(theta_sqrt)
+            B = np.sin(theta_sqrt)/theta_sqrt
         else:
             A = 1.0
-        H = np.cosh(theta) * np.eye(2) + A * SL2.wedge(U)
+            B = 1.0
+        H = A * np.eye(2) + B * SL2.wedge(U)
 
         return SL2(H)
     
     def log(self) -> np.ndarray:
         H = self._H
-        cosh_theta = 0.5*np.trace(H)
-        tmp = (H - cosh_theta*np.eye(2))
-        theta = np.arccosh(cosh_theta)
-        if abs(theta) < 1e-6:
-            U_wedge = tmp
+        alpha = 0.5*np.trace(H)
+        if alpha > 1+1e-8:
+            tmp = np.arccosh(alpha)
+            A = tmp / np.sinh(tmp)
+        elif alpha < 1-1e-8:
+            tmp = np.arccos(alpha)
+            A = tmp / np.sin(tmp)
         else:
-            U_wedge = tmp * theta / np.sinh(theta)
+            A = 1.
 
+        U_wedge = A * (H - alpha*np.eye(2))
         return SL2.vee(U_wedge)
         
     @staticmethod
