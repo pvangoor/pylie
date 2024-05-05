@@ -17,14 +17,28 @@ class SL2(LieGroup):
         return str(self.as_matrix())
     
     def Adjoint(self) -> np.ndarray:
-        pass
+        a = self._H[0,0]
+        b = self._H[0,1]
+        c = self._H[1,0]
+        d = self._H[1,1]
+        return np.array([
+            [2*b*c+1, -a*c, b*d],
+            [-2*a*b, a*a, -b*b],
+            [2*c*d, -c*c, d*d]
+        ])
     
     @staticmethod
     def adjoint(sl2vec : np.ndarray) -> np.ndarray:
         assert isinstance(sl2vec, np.ndarray)
         assert sl2vec.size == 3
-        # ad = np.zeros((3,3))
-        pass
+        u1 = sl2vec[0]
+        u2 = sl2vec[1]
+        u3 = sl2vec[2]
+        return np.array([
+            [0, -u3, u2],
+            [-2*u2, 2*u1, 0],
+            [2*u3, 0, -2*u1]
+        ])
     
     def __mul__(self, other) -> 'SL2':
         if isinstance(other, SL2):
