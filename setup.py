@@ -7,7 +7,7 @@ setuptools.setup(
     name="pylie", # Replace with your own username
     version="0.1.0",
     author="Pieter van Goor",
-    author_email="pieter.vangoor@anu.edu.au",
+    author_email="p.c.h.vangoor@utwente.nl",
     description="Lie groups in Python",
     long_description=long_description,
     long_description_content_type="text/markdown",

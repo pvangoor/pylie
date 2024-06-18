@@ -18,9 +18,11 @@ class SE2(LieGroup):
     
     @staticmethod
     def _rotation_matrix(theta):
+        c = np.cos(theta)
+        s = np.sin(theta)
         return np.array((
-            (np.cos(theta), -np.sin(theta)),
-            (np.sin(theta), np.cos(theta))
+            (c, -s),
+            (s, c)
         ))
     
     @staticmethod
@@ -44,7 +46,7 @@ class SE2(LieGroup):
     def adjoint(se2vec : np.ndarray) -> np.ndarray:
         assert isinstance(se2vec, np.ndarray)
         assert se2vec.size == 3
-        ad = np.zeros((3,3))
+        ad = np.zeros((3,3),dtype=se2vec.dtype)
         ad[1:,0] = -SE2._cross_matrix @ se2vec[1:]
         ad[1:,1:] = SE2._cross_matrix * se2vec[0]
         return ad
@@ -149,7 +151,7 @@ class SE2(LieGroup):
             raise TypeError
         if not vec.size == 3:
             raise ValueError
-        mat = np.zeros((3,3))
+        mat = np.zeros((3,3),dtype=vec.dtype)
         mat[0:2,0:2] = vec[0] * SE2._cross_matrix
         mat[0:2,2] = vec.ravel()[1:]
         return mat

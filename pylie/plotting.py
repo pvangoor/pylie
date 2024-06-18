@@ -11,22 +11,25 @@ from pylie import SO3, SE3, SIM3, LieGroup
 import numpy as np
 
 class frameArtist(Artist):
-    def __init__(self, ax : Axes3D, pose_data : SE3, style='-'):
+    def __init__(self, ax : Axes3D, pose_data : SE3, style='-', colors=None, length=1.0):
         if not isinstance(ax, Axes3D):
             raise TypeError("The axes must be of 3D type.")
         if not isinstance(pose_data, (SIM3, SE3, SO3)):
             raise TypeError("The pose_data must be of one of the types: SIM3, SE3, SO3.")
 
         self._pose_data = pose_data
+        self._length = length
         Q, t = self._pose_to_Qt(pose_data)
 
-        colors = ['r','g','b']
-        colors = [c+style for c in colors]
+        if colors is None:
+            colors = ['r','g','b','k']
+        elif isinstance(colors,str):
+            colors = [colors]*4
         self._frame_lines = []
         for a in range(3):
-            temp, = ax.plot([t[0,0], t[0,0]+Q[0,a]], [t[1,0], t[1,0]+Q[1,a]], [t[2,0], t[2,0]+Q[2,a]], colors[a])
+            temp, = ax.plot([t[0,0], t[0,0]+length*Q[0,a]], [t[1,0], t[1,0]+length*Q[1,a]], [t[2,0], t[2,0]+length*Q[2,a]], linestyle=style, color=colors[a])
             self._frame_lines.append(temp)
-        self._frame_center, = ax.plot(t[0,0], t[1,0], t[2,0], 'ko')
+        self._frame_center, = ax.plot(t[0,0], t[1,0], t[2,0], colors[3]+'.')
 
         if isinstance(pose_data, SO3):
             ax.set_xlim(-1, 1)
@@ -40,7 +43,7 @@ class frameArtist(Artist):
         self._pose_data = pose
         Q, t = self._pose_to_Qt(pose)
         for a in range(3):
-            self._frame_lines[a].set_data_3d([t[0,0], t[0,0]+Q[0,a]], [t[1,0], t[1,0]+Q[1,a]], [t[2,0], t[2,0]+Q[2,a]])
+            self._frame_lines[a].set_data_3d([t[0,0], t[0,0]+self._length*Q[0,a]], [t[1,0], t[1,0]+self._length*Q[1,a]], [t[2,0], t[2,0]+self._length*Q[2,a]])
         self._frame_center.set_data_3d([t[0,0]], [t[1,0]], [t[2,0]])
 
     
@@ -145,12 +148,12 @@ class ArtificialHorizonArtist(Artist):
 
 
 
-def plotFrame(frame : LieGroup, style='-', ax : Axes3D = None):
+def plotFrame(frame : LieGroup, style='-', colors=None, ax : Axes3D = None, length=1.0):
     if ax is None:
         fig = plt.gcf()
         ax = fig.add_subplot(111, projection='3d')
     
-    frame_artist = frameArtist(ax, frame, style)
+    frame_artist = frameArtist(ax, frame, style, colors, length)
 
     return frame_artist
 
@@ -161,9 +164,9 @@ def plotArtificialHorizon(attitude : SO3, ax : Axes3D = None):
     return horizon_artist
 
 if __name__ == "__main__":
-    pose = SE3.identity()
+    # pose = SE3.identity()
     pose = SE3.from_list([1,2,3], "x")
-    pose2 = SE3.from_list([4,5,6], "x")
+    pose2 = SE3.from_list([1.5,2.5,3.5], "x")
 
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
