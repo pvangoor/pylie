@@ -1,6 +1,7 @@
 build/*
 dist/*
-pylie.egg-info/*
+src/pylie.egg-info/*
 pylie/__pycache__/*
 pylie/tests/__pycache__/*
 .vscode/*
+*.pyc

@@ -8,4 +8,4 @@ There are also some analysis and plotting tools.
 
 Run setup and install:
 
-`python3 setup.py sdist bdist_wheel && python3 -m pip install dist/pylie-0.1.0.tar.gz`
+`python3 -m build && python3 -m pip install dist/pylie-0.1.0.tar.gz`
