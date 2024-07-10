@@ -13,6 +13,7 @@ from src.pylie import SE23
 from src.pylie import Quaternion
 from src.pylie import SE2
 from src.pylie import SL2
+from src.pylie import O1_2
 
 import numpy as np
 from scipy.linalg import expm, logm
@@ -87,6 +88,14 @@ class Testself(unittest.TestCase):
     def test_matrix_Adjoint(self):
         for _ in range(RND_REPS):
             X = self.rnd_X()
+            # Test the unit vectors
+            Ad_computed = np.empty((self.Grp.DIM,self.Grp.DIM))
+            for k in range(self.Grp.DIM):
+                e_k = np.zeros(self.Grp.DIM)
+                e_k[k] = 1.
+                Ad_computed[:,k] = self.Grp.vee(X.as_matrix() @ self.Grp.wedge(e_k) @ X.inv().as_matrix())
+            np.testing.assert_almost_equal(Ad_computed, X.Adjoint())
+
             v = self.rnd_v()
             u1 = X.Adjoint() @ v
             u2 = self.Grp.vee(X.as_matrix() @ self.Grp.wedge(v) @ X.inv().as_matrix())
@@ -116,6 +125,12 @@ class Testself(unittest.TestCase):
             np.testing.assert_almost_equal(X1, X2)
 
     def test_log(self):
+        for k in range(self.Grp.DIM):
+            e_k = np.zeros(self.Grp.DIM)
+            e_k[k] = 1.
+            e_k2 = self.Grp.exp(e_k).log()
+            np.testing.assert_almost_equal(e_k, e_k2)
+
         for _ in range(RND_REPS):
             v1 = 0.01*self.rnd_v()
             v2 = self.Grp.exp(v1).log()
@@ -154,6 +169,9 @@ class TestSE2(Testself):
 
 class TestSL2(Testself):
     Grp = SL2
+
+class TestO1_2(Testself):
+    Grp = O1_2
 
 if __name__ == '__main__':
     unittest.main()
