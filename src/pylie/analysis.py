@@ -62,9 +62,9 @@ def umeyama(points1 : np.ndarray, points2 : np.ndarray) -> SIM3:
 
     # Return the result as a SIM3 element
     result = SIM3()
-    result._R._rot = result._R._rot.from_matrix(R)
-    result._x._trans = x
-    result._s._scale = float(s)
+    result._R = result._R.from_matrix(R)
+    result._x = result._x.__init__(x)
+    result._s = result._s.__init__(float(s))
 
     return result
 

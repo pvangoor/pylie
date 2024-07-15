@@ -154,59 +154,59 @@ class SE23(LieGroup):
         u2 = Vinv @ self._w.as_vector()
         return np.concatenate((w,u1,u2))
 
-    @staticmethod
-    def valid_list_formats() -> dict:
-        # Possible formats are
-        # q/w/R/r : SO(3) format specs
-        # x : 3 entry translation
-        # v : 3 entry velocity
-        # P : 12 entry homogeneous matrix (row-by-row)
-        result = {'P':12, 'v':3}
-        result.update(SO3.valid_list_formats())
-        result.update(R3.valid_list_formats())
-        return result
+    # @staticmethod
+    # def valid_list_formats() -> dict:
+    #     # Possible formats are
+    #     # q/w/R/r : SO(3) format specs
+    #     # x : 3 entry translation
+    #     # v : 3 entry velocity
+    #     # P : 12 entry homogeneous matrix (row-by-row)
+    #     result = {'P':12, 'v':3}
+    #     result.update(SO3.valid_list_formats())
+    #     result.update(R3.valid_list_formats())
+    #     return result
 
-    @staticmethod
-    def from_list(line, format_spec="qx") -> 'SE3':
-        result = SE3()
-        SO3_formats = SO3.valid_list_formats()
-        R3_formats = R3.valid_list_formats()
-        for fspec in format_spec:
-            if fspec in SO3_formats:
-                result._R = SO3.from_list(line, fspec)
-                line = line[SO3_formats[fspec]:]
-            elif fspec in R3_formats:
-                result._x = R3.from_list(line, fspec)
-                line = line[R3_formats[fspec]:]
-            elif fspec == "P":
-                mat = np.reshape(np.array([float(line[i]) for i in range(12)]), (3,4))
-                result._R._rot = result._R._rot.from_matrix(mat[0:3,0:3])
-                result._x._trans = mat[0:3,3:4]
-                line = line[12:]
-            elif fspec == "v":
-                result._w = R3.from_list(line, 'x')
-                line = line[R3_formats['x']:]
-            else:
-                return NotImplemented
-        return result
+    # @staticmethod
+    # def from_list(line, format_spec="qx") -> 'SE3':
+    #     result = SE3()
+    #     SO3_formats = SO3.valid_list_formats()
+    #     R3_formats = R3.valid_list_formats()
+    #     for fspec in format_spec:
+    #         if fspec in SO3_formats:
+    #             result._R = SO3.from_list(line, fspec)
+    #             line = line[SO3_formats[fspec]:]
+    #         elif fspec in R3_formats:
+    #             result._x = R3.from_list(line, fspec)
+    #             line = line[R3_formats[fspec]:]
+    #         elif fspec == "P":
+    #             mat = np.reshape(np.array([float(line[i]) for i in range(12)]), (3,4))
+    #             result._R = result._R.from_matrix(mat[0:3,0:3])
+    #             result._x = R3(mat[0:3,3:4])
+    #             line = line[12:]
+    #         elif fspec == "v":
+    #             result._w = R3.from_list(line, 'x')
+    #             line = line[R3_formats['x']:]
+    #         else:
+    #             return NotImplemented
+    #     return result
 
-    def to_list(self, format_spec) -> list:
-        result = []
-        SO3_formats = SO3.valid_list_formats()
-        R3_formats = R3.valid_list_formats()
-        for fspec in format_spec:
-            if fspec in SO3_formats:
-                result += self._R.to_list(fspec)
-            elif fspec in R3_formats:
-                result += self._x.to_list(fspec)
-            elif fspec == "P":
-                posemat = np.hstack((self.R().as_matrix(), self.x().as_vector()))
-                result += posemat.ravel().tolist()
-            elif fspec == "v":
-                result += self._w.to_list('x')
-            else:
-                return NotImplemented
-        return result
+    # def to_list(self, format_spec) -> list:
+    #     result = []
+    #     SO3_formats = SO3.valid_list_formats()
+    #     R3_formats = R3.valid_list_formats()
+    #     for fspec in format_spec:
+    #         if fspec in SO3_formats:
+    #             result += self._R.to_list(fspec)
+    #         elif fspec in R3_formats:
+    #             result += self._x.to_list(fspec)
+    #         elif fspec == "P":
+    #             posemat = np.hstack((self.R().as_matrix(), self.x().as_vector()))
+    #             result += posemat.ravel().tolist()
+    #         elif fspec == "v":
+    #             result += self._w.to_list('x')
+    #         else:
+    #             return NotImplemented
+    #     return result
     
     @staticmethod
     def list_header(format_spec) -> list:

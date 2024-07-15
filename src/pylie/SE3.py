@@ -162,8 +162,8 @@ class SE3(LieGroup):
                 line = line[R3_formats[fspec]:]
             elif fspec == "P":
                 mat = np.reshape(np.array([float(line[i]) for i in range(12)]), (3,4))
-                result._R._rot = result._R._rot.from_matrix(mat[0:3,0:3])
-                result._x._trans = mat[0:3,3]
+                result._R = result._R.from_matrix(mat[0:3,0:3])
+                result._x = R3(mat[0:3,3])
                 line = line[12:]
             else:
                 return NotImplemented
