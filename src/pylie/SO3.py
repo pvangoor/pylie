@@ -7,13 +7,14 @@ import numpy as np
 class SO3(LieGroup):
     DIM = 3
     def __init__(self, R = None):
-        self._rot = Rotation.identity()
-        if isinstance(R, np.ndarray):
-            self._rot = Rotation.from_matrix(R)
+        if R is None:
+            self._R = np.eye(3)
+        elif isinstance(R, np.ndarray):
+            self._R = R
         elif isinstance(R, SO3):
-            self._rot = R._rot
+            self._R = R._R
         elif isinstance(R, Rotation):
-            self._rot = R
+            self._R = R.as_matrix()
             
     @staticmethod
     def adjoint(so3vec : np.ndarray) -> np.ndarray:
@@ -22,50 +23,51 @@ class SO3(LieGroup):
         return SO3.skew(so3vec)
             
     def R(self) -> np.ndarray:
-        return self._rot.as_matrix()
+        return self._R
 
     def as_quaternion(self) -> np.ndarray:
-        return self._rot.as_quat()
-    
+        return Rotation.from_matrix(self._R).as_quat()
+
     def as_euler(self) -> np.ndarray:
-        return self._rot.as_euler('xyz')
+        return Rotation.from_matrix(self._R).as_euler('xyz')
 
     def __str__(self):
-        return str(self._rot.as_matrix())
+        return str(self._R)
     
     def Adjoint(self):
-        return self._rot.as_matrix()
+        return self.as_matrix()
     
     def __mul__(self, other):
         if isinstance(other, SO3):
-            result = SO3()
-            result._rot = self._rot * other._rot
-            return result
+            return SO3(self._R @ other._R)
         elif isinstance(other, np.ndarray) and other.shape[0] == 3:
-            return self._rot.as_matrix() @ other
+            return self.as_matrix() @ other
         elif isinstance(other, R3):
             result = R3()
-            result._trans = self._rot.as_matrix() @ other._trans
+            result._trans = self._R @ other._trans
             return result
         return NotImplemented
     
     def __truediv__(self, other):
         if isinstance(other, SO3):
-            result = SO3()
-            result._rot = self._rot * other._rot.inv()
-            return result
+            return self * other.inv()
         return NotImplemented
     
     def inv(self):
-        result = SO3()
-        result._rot = self._rot.inv()
-        return result
+        return SO3(self._R.T)
     
     def log(self):
-        return np.reshape(self._rot.as_rotvec(), 3)
+        theta = np.arccos((np.trace(self._R) - 1.0) / 2.0)
+        if abs(theta) > 1e-6:
+            coefficient = theta / (2.0 * np.sin(theta))
+        else:
+            coefficient = 0.5
+
+        Omega = coefficient * (self._R - self._R.transpose())
+        return SO3.vee(Omega)
     
     def as_matrix(self):
-        return self._rot.as_matrix()
+        return self._R
 
     @staticmethod
     def from_matrix(mat : np.ndarray) -> 'SO3':
@@ -74,22 +76,27 @@ class SO3(LieGroup):
         if not mat.shape == (3,3):
             raise ValueError
         
-        result = SO3()
-        result._rot = Rotation.from_matrix(mat)
-        return result
+        return SO3(mat)
     
     @staticmethod
     def identity():
-        result = SO3()
-        result._rot = Rotation.identity()
-        return result
+        return SO3(np.eye(3))
 
     @staticmethod
     def exp(so3vec):
         assert so3vec.size == 3, "The so(3) Lie algebra vector must have 3 elements."
-        result = SO3()
-        result._rot = Rotation.from_rotvec(so3vec.ravel())
-        return result
+        theta = np.linalg.norm(so3vec)
+        if theta == 0.0:
+            return SO3(np.eye(3))
+        elif theta < 1e-6:
+            t1 = 1.0 - theta**2/6.0
+            t2 = 0.5 - theta**2/24.0
+        else:
+            t1 = np.sin(theta) / theta
+            t2 = (1.0 - np.cos(theta)) / (theta**2)
+
+        Omega = SO3.wedge(so3vec)
+        return SO3(np.eye(3) + t1 * Omega + t2 * Omega @ Omega)
 
     @staticmethod
     def valid_list_formats() -> dict:
@@ -105,19 +112,19 @@ class SO3(LieGroup):
         result = SO3()
         if format_spec == "R":
             mat = np.reshape(np.array([float(line[i]) for i in range(9)]), (3,3))
-            result._rot = Rotation.from_matrix(mat)
+            result._R = mat
             line = line[9:]
         elif format_spec == "q":
             quat = np.array([float(line[i]) for i in range(4)])
-            result._rot = Rotation.from_quat(quat)
+            result._R = Rotation.from_quat(quat).as_matrix()
             line = line[4:]
         elif format_spec == "w":
             quat = np.array([float(line[i]) for i in [1,2,3,0]])
-            result._rot = Rotation.from_quat(quat)
+            result._R = Rotation.from_quat(quat).as_matrix()
             line = line[4:]
         elif format_spec == "r":
             rotvec = np.array([float(line[i]) for i in range(3)])
-            result._rot = Rotation.from_rotvec(rotvec)
+            result = SO3.exp(rotvec)
             line = line[3:]
         else:
             return NotImplemented
@@ -125,17 +132,17 @@ class SO3(LieGroup):
 
     def to_list(self, format_spec) -> list:
         if format_spec == "R":
-            mat = self._rot.as_matrix()
+            mat = self.as_matrix()
             result = mat.ravel().tolist()
         elif format_spec == "q":
-            quat = self._rot.as_quat()
+            quat = self.as_quat()
             result = quat.ravel().tolist()
         elif format_spec == "w":
-            quat = self._rot.as_quat()
+            quat = self.as_quat()
             temp = quat.ravel().tolist()
             result = [temp[i] for i in [3,0,1,2]]
         elif format_spec == "r":
-            rotvec = self._rot.as_rotvec()
+            rotvec = self.log()
             result = rotvec.ravel().tolist()
         else:
             return NotImplemented
