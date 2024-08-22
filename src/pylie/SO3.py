@@ -28,8 +28,8 @@ class SO3(LieGroup):
     def as_quaternion(self) -> np.ndarray:
         return Rotation.from_matrix(self._R).as_quat()
 
-    def as_euler(self) -> np.ndarray:
-        return Rotation.from_matrix(self._R).as_euler('xyz')
+    def as_euler(self, seq='xyz', degrees=True) -> np.ndarray:
+        return Rotation.from_matrix(self._R).as_euler(seq, degrees=degrees)
 
     def __str__(self):
         return str(self._R)
