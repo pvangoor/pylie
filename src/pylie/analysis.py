@@ -34,10 +34,13 @@ def umeyama(points1 : np.ndarray, points2 : np.ndarray) -> SIM3:
     # This function solves the least squares problem of finding a SIM3 transform S such that
     # S * points1 = points2,
     # s_S * R_S * points1_i + x_S = points2_i
-    if isinstance(points1, list):
-        points1 = np.hstack(points1)
-    if isinstance(points2, list):
-        points2 = np.hstack(points2)
+    def _list_to_stack(points):
+        if isinstance(points, list):
+            return np.stack([p.ravel() for p in points]).T
+        else:
+            return points
+    points1 = _list_to_stack(points1)
+    points2 = _list_to_stack(points2)
     assert isinstance(points1, np.ndarray) and isinstance(points2, np.ndarray), "The points must be in numpy arrays."
     assert points1.shape == points2.shape, "The points are not matched."
     assert points1.shape[0] == 3, "The points are not 3D."
@@ -63,8 +66,8 @@ def umeyama(points1 : np.ndarray, points2 : np.ndarray) -> SIM3:
     # Return the result as a SIM3 element
     result = SIM3()
     result._R = result._R.from_matrix(R)
-    result._x = result._x.__init__(x)
-    result._s = result._s.__init__(float(s))
+    result._x.__init__(x)
+    result._s.__init__(float(s))
 
     return result
 
