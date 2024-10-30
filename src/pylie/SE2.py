@@ -86,10 +86,25 @@ class SE2(LieGroup):
             raise ValueError
         
         result = SE2()
-        result._R = np.arctan2(mat[1,0], mat[0,0])
+        result._theta = np.arctan2(mat[1,0], mat[0,0])
         result._p = mat[0:2,2]
         return result
     
+    def as_vector(self) -> np.ndarray:
+        return np.array([self._theta, self._p[0], self._p[1]])
+    
+    @staticmethod
+    def from_vector(mat : np.ndarray) -> 'SE2':
+        if not isinstance(mat, np.ndarray):
+            raise TypeError
+        if not mat.size == 3:
+            raise ValueError
+        
+        result = SE2()
+        result._theta = mat.item(0)
+        result._p = np.array([mat.item(1),mat.item(2)])
+        return result
+
     def __truediv__(self, other) -> 'SE2':
         if isinstance(other, SE2):
             return self * other.inv()
