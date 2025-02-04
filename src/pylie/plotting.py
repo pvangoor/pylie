@@ -2,12 +2,13 @@ try:
     import matplotlib.pyplot as plt
     from matplotlib.artist import Artist
     from matplotlib.patches import Wedge, Circle, Arc
+    from matplotlib.axes import Axes
     from mpl_toolkits.mplot3d import Axes3D
 except ImportError as error:
     print("The plotting functionality of pylie depends on matplotlib.")
     raise error
 
-from pylie import SO3, SE3, SIM3, LieGroup
+from pylie import SO3, SE3, SIM3, SE2, LieGroup
 import numpy as np
 
 class frameArtist(Artist):
@@ -58,6 +59,44 @@ class frameArtist(Artist):
         Q = mat[0:3,0:3]
         t = mat[0:3,3:4]
         return Q, t
+    
+
+class frameArtist2(Artist):
+    # Frame artist for SE(2) frames
+    def __init__(self, ax : Axes, pose_data : SE2, style='-', colors=None, length=1.0):
+        if not isinstance(ax, Axes):
+            raise TypeError("The axes must be of 2D type.")
+        if not isinstance(pose_data, (SE2)):
+            raise TypeError("The pose_data must be of SE2 type.")
+
+        self._pose_data = pose_data
+        self._length = length
+        Q, t = pose_data.R(), pose_data.p()
+
+        if colors is None:
+            colors = ['r','g','b']
+        elif isinstance(colors,str):
+            colors = [colors]*3
+        self._frame_lines = []
+        for a in range(2):
+            temp, = ax.plot([t[0], t[0]+length*Q[0,a]], [t[1], t[1]+length*Q[1,a]], linestyle=style, color=colors[a])
+            self._frame_lines.append(temp)
+        self._frame_center, = ax.plot(t[0], t[1], colors[-1]+'.')
+    
+    def set_pose_data(self, pose : SE2):
+        if not isinstance(pose, (SE2)):
+            raise TypeError("The pose_data must be of SE2 type.")
+        
+        self._pose_data = pose
+        Q, t = pose.R(), pose.p()
+        for a in range(2):
+            self._frame_lines[a].set_data([t[0], t[0]+self._length*Q[0,a]], [t[1], t[1]+self._length*Q[1,a]])
+        self._frame_center.set_data([t[0]], [t[1]])
+
+    
+    @staticmethod
+    def _pose_to_Qt(pose : SE2):
+        return pose.theta(), pose.p()
 
 class ArtificialHorizonArtist(Artist):
     def __init__(self, ax : plt.Axes, attitude_data : SO3):
@@ -157,6 +196,15 @@ def plotFrame(frame : LieGroup, style='-', colors=None, ax : Axes3D = None, leng
 
     return frame_artist
 
+def plotFrame2(frame : SE2, style='-', colors=None, ax : Axes = None, length=1.0):
+    if ax is None:
+        fig = plt.gcf()
+        ax = fig.add_subplot()
+    
+    frame_artist = frameArtist2(ax, frame, style, colors, length)
+
+    return frame_artist
+
 def plotArtificialHorizon(attitude : SO3, ax : Axes3D = None):
     if ax is None:
         ax = plt.gca()
@@ -176,7 +224,7 @@ if __name__ == "__main__":
     artist.set_pose_data(pose2)
     plt.show()
 
-    plt.cla()
+    plt.clf()
 
     yaw_tf = SO3.from_list(np.array([0,0,0.5]), 'r')
     att = SO3.from_list(np.array([0.1,0,0.]), 'r')
@@ -193,5 +241,15 @@ if __name__ == "__main__":
         artist = plotArtificialHorizon(att)
         plt.pause(0.2)
     
+    plt.show()
+
+    plt.clf()
+
+
+    pose = SE2(0.2, np.array([0.1,0.5]))
+    pose2 = SE2(0.3, np.array([0.1,0.5]))
+    artist = plotFrame2(pose)
+    plt.pause(1)
+    artist.set_pose_data(pose2)
     plt.show()
 
