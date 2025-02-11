@@ -31,6 +31,10 @@ class SO3(LieGroup):
     def as_euler(self, seq='xyz', degrees=True) -> np.ndarray:
         return Rotation.from_matrix(self._R).as_euler(seq, degrees=degrees)
 
+    @staticmethod
+    def from_euler(euler_angles, seq='xyz', degrees=True) -> np.ndarray:
+        return SO3.from_matrix(Rotation.from_euler(seq=seq, angles=euler_angles, degrees=degrees).as_matrix())
+
     def __str__(self):
         return str(self._R)
     
