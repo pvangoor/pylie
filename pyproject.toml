@@ -9,6 +9,7 @@ version = "0.2.0"
 authors = [
   { name="Pieter van Goor", email="p.c.h.vangoor@utwente.nl" },
 ]
+license = { file = "LICENSE" }
 description = "Lie groups in Python"
 readme = "README.md"
 requires-python = ">=3.6"
