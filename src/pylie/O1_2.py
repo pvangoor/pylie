@@ -1,8 +1,6 @@
 from .LieGroup import LieGroup
 import numpy as np
 
-from scipy.linalg import expm, logm
-
 # The indefinite orthogonal group of signature 1,2
 class O1_2(LieGroup):
     DIM = 3
