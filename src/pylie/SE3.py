@@ -50,7 +50,10 @@ class SE3(LieGroup):
             return result
         if isinstance(other, np.ndarray):
             if other.shape[0] == 3:
-                return self._x + (self._R * other)
+                if len(other.shape) == 0:
+                    return (self._R * other) + self._x.as_vector()
+                else:
+                    return (self._R * other) + self._x.as_vector()[:,np.newaxis]
             elif other.shape[0] == 4:
                 return self.as_matrix() @ other
         

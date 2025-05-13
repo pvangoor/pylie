@@ -61,7 +61,10 @@ class SO3(LieGroup):
         return SO3(self._R.T)
     
     def log(self):
-        theta = np.arccos((np.trace(self._R) - 1.0) / 2.0)
+        t = (np.trace(self._R) - 1.0) / 2.0
+        if abs(t) > 1.0:
+            t = t / abs(t)
+        theta = np.arccos(t)
         if abs(theta) > 1e-6:
             coefficient = theta / (2.0 * np.sin(theta))
         else:

@@ -1,6 +1,7 @@
 from .SIM3 import SIM3
 import numpy as np
 from .Trajectory import Trajectory
+from .LieGroup import LieGroup
 
 def align_trajectory(trajectory0 : Trajectory, trajectory1 : Trajectory, ret_params=False) -> Trajectory:
     # Align trajectory0 to trajectory1
@@ -71,13 +72,72 @@ def umeyama(points1 : np.ndarray, points2 : np.ndarray) -> SIM3:
 
     return result
 
-if __name__ == "__main__":
-    true_transform = SIM3.from_list(np.random.randn(1,7).ravel().tolist(), "srx")
-    print(true_transform)
 
-    points1 = np.random.randn(3,10)
-    points2 = true_transform * points1
+def RKMK3_integrate(X0 : LieGroup, f, h : float) -> LieGroup:
+    # X0 is the initial condition
+    # f is the vector field in the form $\dot{X} = X f(X)$.
+    # h is the step size
+    # Based on Algorithm 3.2 from the paper:
+    # Munthe-Kaas, Hans. "Runge-Kutta methods on Lie groups." BIT Numerical Mathematics 38 (1998): 92-111.
 
-    est_transform = umeyama(points1, points2)
-    print(est_transform)
-    
+    # Set up the coefficients
+    A = np.array([
+        [0,0,0],
+        [0.5,0,0],
+        [-1.,2.,0],
+    ])
+    b = np.array([1/6.,2/3.,1/6.])
+    # c = np.array([0,0.5,1.0])
+
+    # Compute the iteration
+    I1 = f(X0)
+    k = [I1]
+    for i in range(1,3):
+        u = h * A[i,:i] @ k
+        k.append(f(X0 * X0.exp(u)))
+        
+    v = h * sum(b[j] * k[j] for j in range(3))
+    vTilde = v + h / 6. * X0.adjoint(I1) @ v
+    X1 = X0 * X0.exp(vTilde)
+
+    return X1
+
+
+def RKMK4_integrate(X0 : LieGroup, f, h : float) -> LieGroup:
+    # X0 is the initial condition
+    # f is the vector field in the form $\dot{X} = X f(X)$.
+    # h is the step size
+    # Based on Algorithm 3.3 from the paper:
+    # Munthe-Kaas, Hans. "Runge-Kutta methods on Lie groups." BIT Numerical Mathematics 38 (1998): 92-111.
+
+    # Set up the coefficients
+    A = np.array([
+        [0,0,0,0],
+        [0.5,0,0,0],
+        [0,0.5,0,0],
+        [0,0,1.0,0],
+    ])
+    b = np.array([1/6.,1/3.,1/3.,1/6.])
+    c = np.array([0,0.5,0.5,1.0])
+    d = A @ c
+    coeff_matrix = np.array([
+        [c[1], c[1]**2, 2*d[1]],
+        [c[2], c[2]**2, 2*d[2]],
+        [c[3], c[3]**2, 2*d[3]],
+    ])
+    m = np.linalg.solve(coeff_matrix.T, np.array([1.,0,0]))
+
+    # Compute the iteration
+    I1 = f(X0)
+    k = [I1]
+    for i in range(1,4):
+        u = h * A[i,:i] @ k
+        uTilde = u + c[i]*h/6. * X0.adjoint(I1) @ u
+        k.append(f(X0 * X0.exp(uTilde)))
+        
+    I2 = sum(m[i] * (k[i+1] - I1) for i in range(3)) / h
+    v = h * sum(b[j] * k[j] for j in range(4))
+    vTilde = v + h / 4. * X0.adjoint(I1) @ v + h**2 / 24. * X0.adjoint(I2) @ v
+    X1 = X0 * X0.exp(vTilde)
+
+    return X1

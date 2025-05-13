@@ -11,6 +11,7 @@ import numpy as np
 from scipy.linalg import expm, logm
 import unittest
 
+np.random.seed(0)
 RND_REPS = 100
 
 class Testself(unittest.TestCase):
