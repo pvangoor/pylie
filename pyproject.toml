@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pylieg"
-version = "0.2.0"
+version = "0.2.1"
 authors = [
   { name="Pieter van Goor", email="p.c.h.vangoor@utwente.nl" },
 ]
@@ -44,4 +44,5 @@ push = true
 [tool.bumpver.file_patterns]
 "pyproject.toml" = [
     'current_version = "{version}"',
+    'version = "{version}"',
 ]
