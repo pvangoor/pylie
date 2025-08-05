@@ -116,21 +116,16 @@ class Trajectory:
         if len(idx0) > 0:
             idx0 = idx0[0]
         else:
-            self._times.clear()
-            self._elements.clear()
-            return
+            return Trajectory([], [])
 
         idx1 = [j for j in reversed(
             range(len(self._times))) if self._times[j] <= t1]
         if len(idx1) > 0:
             idx1 = idx1[0]
         else:
-            self._times.clear()
-            self._elements.clear()
-            return
+            return Trajectory([], [])
 
-        self._times = self._times[idx0:idx1]
-        self._elements = self._elements[idx0:idx1]
+        return Trajectory(self._elements[idx0:idx1],self._times[idx0:idx1])
 
     def _clean_duplicates(self):
         for i in reversed(range(len(self._times)-1)):
