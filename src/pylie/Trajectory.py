@@ -112,20 +112,12 @@ class Trajectory:
     def truncate(self, t0, t1):
         assert t0 < t1
 
-        idx0 = [j for j in range(len(self._times)) if self._times[j] >= t0]
-        if len(idx0) > 0:
-            idx0 = idx0[0]
-        else:
+        # idx0 = [j for j in range(len(self._times)) if self._times[j] >= t0]
+        indices = np.searchsorted(self._times, (t0,t1))
+        if indices[0] == len(self._times) or indices[1] == 0:
             return Trajectory([], [])
 
-        idx1 = [j for j in reversed(
-            range(len(self._times))) if self._times[j] <= t1]
-        if len(idx1) > 0:
-            idx1 = idx1[0]
-        else:
-            return Trajectory([], [])
-
-        return Trajectory(self._elements[idx0:idx1],self._times[idx0:idx1])
+        return Trajectory(self._elements[indices[0]:indices[1]],self._times[indices[0]:indices[1]])
 
     def _clean_duplicates(self):
         for i in reversed(range(len(self._times)-1)):
