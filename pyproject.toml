@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 name = "pylieg"
 version = "0.2.3"
 authors = [
-  { name="Pieter van Goor", email="p.c.h.vangoor@utwente.nl" },
+  { name="Pieter van Goor", email="pieter.vangoor@sydney.edu.au" },
 ]
 license = { file = "LICENSE" }
 description = "Lie groups in Python"
