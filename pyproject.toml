@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pylieg"
-version = "0.2.3"
+version = "0.2.4"
 authors = [
   { name="Pieter van Goor", email="pieter.vangoor@sydney.edu.au" },
 ]
@@ -30,7 +30,7 @@ Homepage = "https://github.com/pvangoor/pylie"
 Issues = "https://github.com/pvangoor/pylie/issues"
 
 [tool.bumpver]
-current_version = "0.2.3"
+current_version = "0.2.4"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message = "Bump version {old_version} -> {new_version}"
 tag_message = "{new_version}"
