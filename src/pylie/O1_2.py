@@ -32,9 +32,9 @@ class O1_2(LieGroup):
     def Adjoint(self) -> np.ndarray:
         Ad_mat = np.empty((3,3))
         A,b,c,d = self._extract_components()
-        Ad_mat[0,0] = -0.5 * np.trace(self._cross_mat @ A @ self._cross_mat @ A.T)
-        Ad_mat[1:,0] = -A @ self._cross_mat @ b
-        Ad_mat[0,1:] = A.T @ self._cross_mat.T @ c
+        Ad_mat[0,0] = np.linalg.det(A)
+        Ad_mat[1:,0] = -self._cross_mat @ c
+        Ad_mat[0,1:] = self._cross_mat.T @ b
         Ad_mat[1:,1:] = d * A - np.outer(c,b)
         return Ad_mat
         
