@@ -142,10 +142,10 @@ class SO3(LieGroup):
             mat = self.as_matrix()
             result = mat.ravel().tolist()
         elif format_spec == "q":
-            quat = self.as_quat()
+            quat = self.as_quaternion()
             result = quat.ravel().tolist()
         elif format_spec == "w":
-            quat = self.as_quat()
+            quat = self.as_quaternion()
             temp = quat.ravel().tolist()
             result = [temp[i] for i in [3,0,1,2]]
         elif format_spec == "r":
